@@ -1,210 +1,212 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>Coinhat-Feeds — Memecoins Solana</title>
-<link rel="icon" href="assets/logo.jpg" type="image/jpeg"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coinhat-Feeds</title>  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">  <link rel="stylesheet" href="style.css">
+</head><body><!-- OVERLAY --><div id="overlay" class="overlay"></div><!-- MENU --><aside id="menu" class="menu">  <div class="menu-header">
+    <div class="brand-row">
+      <img src="./assets/logo.jpg" class="brand-logo" alt="Coinhat">
+      <h2>Coinhat<span>Feeds</span></h2>
+    </div><button id="close-menu">✕</button>
 
-<!-- Logo injected via JS from assets/logo.jpg -->
-<script>
-  // Preload logo as data URL so all img tags get it consistently
-  (function(){
-    const img = new Image();
-    img.onload = function(){
-      const c = document.createElement('canvas');
-      c.width = img.width; c.height = img.height;
-      c.getContext('2d').drawImage(img, 0, 0);
-      window.COINHAT_LOGO = c.toDataURL('image/jpeg', 0.9);
-    };
-    img.src = 'assets/logo.jpg';
-  })();
-</script>
-</head>
-<body>
+  </div>  <nav class="menu-links"><button class="menu-item active" data-section="home">
+  🏠 Home
+</button>
 
-<!-- TOAST -->
-<div id="toasts"></div>
+<button class="menu-item" data-section="airdrops">
+  🚀 Airdrops
+</button>
 
-<!-- MENU OVERLAY -->
-<div id="menu-overlay" class="menu-overlay">
-  <div class="menu-backdrop" id="menu-backdrop"></div>
-  <aside class="menu-panel">
-    <div class="menu-header">
-      <div class="menu-brand">
-        <img src="assets/logo.jpg" alt="Coinhat" class="menu-brand-logo"/>
-        <span class="menu-brand-name">Coinhat<span style="color:var(--blue)">Feeds</span></span>
-      </div>
-      <button class="menu-close-btn" id="menu-close">✕</button>
-    </div>
-    <nav class="menu-nav">
-      <div class="menu-item active" data-sec="home"><span class="mi-icon">🏠</span><span class="mi-label">Home</span><span class="mi-arrow">›</span></div>
-      <div class="menu-item" data-sec="airdrops"><span class="mi-icon">🚀</span><span class="mi-label">Airdrops</span><span class="mi-arrow">›</span></div>
-      <div class="menu-item" data-sec="alpha"><span class="mi-icon">⚡</span><span class="mi-label">Alpha</span><span class="mi-badge">NEW</span></div>
-      <div class="menu-item" data-sec="swap"><span class="mi-icon">🔄</span><span class="mi-label">Swap</span><span class="mi-arrow">›</span></div>
-      <div class="menu-item" data-sec="news"><span class="mi-icon">📰</span><span class="mi-label">Notícias</span><span class="mi-arrow">›</span></div>
-      <div class="menu-item" data-sec="partners"><span class="mi-icon">💎</span><span class="mi-label">Parceiros</span><span class="mi-arrow">›</span></div>
-    </nav>
-    <div class="menu-footer">
-      <p class="menu-tagline">Powered by <strong>Solana</strong></p>
-      <div class="menu-socials">
-        <a href="#" class="soc-btn">𝕏</a>
-        <a href="#" class="soc-btn">✈</a>
-        <a href="#" class="soc-btn">🔗</a>
-      </div>
-    </div>
-  </aside>
-</div>
+<button class="menu-item" data-section="alpha">
+  ⚡ Alpha
+</button>
 
-<!-- TOKEN MODAL -->
-<div id="token-modal" class="token-modal">
-  <div class="modal-backdrop" id="modal-backdrop"></div>
-  <div class="modal-panel">
-    <div class="modal-drag"></div>
-    <div class="modal-head">
-      <div class="modal-token-row">
-        <img id="m-logo" src="" alt="" class="modal-logo"/>
-        <div>
-          <div class="modal-tname" id="m-name"></div>
-          <div class="modal-tsym" id="m-sym"></div>
-        </div>
-      </div>
-      <button class="modal-close-btn" id="modal-close">✕</button>
+<button class="menu-item" data-section="swap">
+  🔄 Swap
+</button>
+
+<button class="menu-item" data-section="news">
+  📰 Notícias
+</button>
+
+  </nav></aside><!-- TOKEN MODAL --><div id="token-modal" class="token-modal">  <div class="token-box"><div class="token-top">
+
+  <div class="token-info">
+
+    <img id="token-logo" src="" alt="">
+
+    <div>
+      <h2 id="token-name">Token</h2>
+      <span id="token-symbol">TKN</span>
     </div>
-    <div class="modal-body">
-      <div class="modal-stats">
-        <div class="stat-box"><span class="stat-label">Preço</span><span class="stat-value" id="m-price"></span></div>
-        <div class="stat-box"><span class="stat-label">Variação 24h</span><span class="stat-value" id="m-chg"></span></div>
-        <div class="stat-box"><span class="stat-label">Market Cap</span><span class="stat-value" id="m-mcap"></span></div>
-        <div class="stat-box"><span class="stat-label">Volume 24h</span><span class="stat-value" id="m-vol"></span></div>
-        <div class="stat-box"><span class="stat-label">Liquidez</span><span class="stat-value" id="m-liq"></span></div>
-        <div class="stat-box"><span class="stat-label">Rede</span><span class="stat-value">Solana</span></div>
-      </div>
-      <div class="modal-chart-wrap">
-        <div class="chart-label">📊 Gráfico em Tempo Real — DexScreener</div>
-        <iframe id="m-chart" class="modal-chart" src="" frameborder="0" allowtransparency="true"></iframe>
-      </div>
-      <div class="modal-contract">
-        <span class="contract-lbl">Endereço do Contrato</span>
-        <div class="contract-row">
-          <span class="contract-addr" id="m-contract">—</span>
-          <button class="copy-btn" id="copy-contract-btn">Copiar ⎘</button>
-        </div>
-      <div class="modal-links" id="m-links"></div>
-      <button class="swap-btn" id="modal-swap-btn"><span>🔄</span><span>Swap via Jupiter</span></button>
-    </div>
+
   </div>
+
+  <button id="close-token">✕</button>
+
 </div>
 
-<!-- SWAP MODAL -->
-<div id="swap-modal" class="swap-modal">
-  <div class="modal-backdrop" id="swap-backdrop"></div>
-  <div class="swap-panel">
-    <div class="swap-head">
-      <div class="swap-head-title"><span>🔄</span> Jupiter Swap</div>
-      <button class="modal-close-btn" id="swap-close">✕</button>
-    </div>
-    <div class="swap-body">
-      <iframe id="jupiter-iframe"
-        src="https://jup.ag/swap/SOL-USDC?referral=Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie"
-        width="100%" height="520" frameborder="0"
-        allowtransparency="true"
-        style="border-radius:12px;border:1px solid var(--border)"></iframe>
-    </div>
+<div class="token-stats">
+
+  <div class="stat">
+    <span>Preço</span>
+    <strong id="token-price">$0.00</strong>
   </div>
+
+  <div class="stat">
+    <span>24h</span>
+    <strong id="token-change">0%</strong>
+  </div>
+
+  <div class="stat">
+    <span>Volume</span>
+    <strong id="token-volume">$0</strong>
+  </div>
+
+  <div class="stat">
+    <span>Liquidez</span>
+    <strong id="token-liquidity">$0</strong>
+  </div>
+
 </div>
 
-<!-- APP -->
-<div id="app">
-  <header class="header">
-    <div class="h-inner">
-      <div class="h-left">
-        <button class="hamburger" id="hamburger"><span></span><span></span></button>
-        <a href="#" class="brand">
-          <img src="assets/logo.jpg" alt="Coinhat" class="brand-logo"/>
-          <span class="brand-name">Coinhat<span class="brand-accent">Feeds</span></span>
-        </a>
-      </div>
-      <div class="h-right">
-        <div class="search-wrap" id="search-wrap">
-          <input type="text" id="search-input" class="search-input" placeholder="Buscar token…" autocomplete="off"/>
-          <button class="search-btn" id="search-toggle">🔍</button>
-          <div class="search-drop" id="search-drop"></div>
-        </div>
-      </div>
-    <div class="ticker-bar">
-      <div class="ticker-track" id="ticker-track">
-        <span style="padding:0 20px;color:var(--t3);font-size:.75rem">Carregando preços…</span>
-      </div>
+<div class="chart-wrap">
+
+  <iframe
+    id="token-chart"
+    src=""
+    frameborder="0"
+    allowfullscreen>
+  </iframe>
+
+</div>
+
+<div class="token-links" id="token-links"></div>
+
+<button id="swap-btn" class="swap-btn">
+  🔄 Swap via Jupiter
+</button>
+
+  </div></div><!-- APP --><div class="app">  <!-- HEADER -->  <header class="header"><div class="header-inner">
+
+  <div class="header-left">
+
+    <button id="open-menu" class="hamburger">
+
+      <span></span>
+      <span></span>
+      <span></span>
+
+    </button>
+
+    <div class="brand">
+
+      <img src="./assets/logo.jpg" alt="Coinhat">
+
+      <h1>
+        Coinhat<span>Feeds</span>
+      </h1>
+
     </div>
-  </header>
 
-  <main class="main">
-    <section id="sec-home" class="section active">
-      <div class="sec-title-row">
-        <h1 class="sec-title">🔥 Memecoins em Alta</h1>
-        <div class="live-badge"><span class="pulse-dot"></span>LIVE</div>
-      </div>
-      <p class="sec-sub">Solana Network • Atualizado em tempo real</p>
-      <div class="coin-grid" id="coin-grid"></div>
-    </section>
+  </div>
 
-    <section id="sec-airdrops" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">🚀 Airdrops</h1></div>
-      <p class="sec-sub">Últimas oportunidades na Solana</p>
-      <div id="airdrops-content" class="content-cards"></div>
-    </section>
+  <div class="header-right">
 
-    <section id="sec-alpha" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">⚡ Alpha</h1><span class="badge-new">NEW</span></div>
-      <p class="sec-sub">Sinais exclusivos da comunidade</p>
-      <div id="alpha-content"></div>
-    </section>
+    <input
+      type="text"
+      id="search"
+      placeholder="Buscar memecoin..."
+    >
 
-    <section id="sec-swap" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">🔄 Swap</h1></div>
-      <div class="swap-section">
-        <p class="swap-section-desc">Troque tokens Solana com a melhor cotação via Jupiter Aggregator.</p>
-        <button class="swap-btn" id="open-swap-btn" style="max-width:260px;font-size:1rem;padding:14px 28px">🔄 Abrir Jupiter Swap</button>
-      </div>
-    </section>
+  </div>
 
-    <section id="sec-news" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">📰 Notícias Cripto</h1></div>
-      <p class="sec-sub">As últimas do mercado</p>
-      <div id="news-grid" class="news-grid"></div>
-    </section>
-
-    <section id="sec-partners" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">💎 Parceiros</h1></div>
-      <p class="sec-sub">Nosso ecossistema</p>
-      <div id="partners-grid" class="partners-grid"></div>
-    </section>
-  </main>
-
-  <footer class="footer">© 2025 Coinhat-Feeds • Powered by Solana • Not financial advice</footer>
 </div>
 
-<!-- SCRIPTS (load order matters) -->
-<script src="utils/cache.js"></script>
-<script src="utils/format.js"></script>
-<script src="utils/animations.js"></script>
-<script src="services/binance.js"></script>
-<script src="services/dexscreener.js"></script>
-<script src="services/jupiter.js"></script>
-<script src="services/newsapi.js"></script>
-<script src="components/menu.js"></script>
-<script src="components/search.js"></script>
-<script src="components/ticker.js"></script>
-<script src="components/memecoins.js"></script>
-<script src="components/modal.js"></script>
-<script src="components/swap.js"></script>
-<script src="components/news.js"></script>
-<script src="components/sections.js"></script>
-<script src="app.js"></script>
-</body>
+<!-- TICKER -->
+<div class="ticker">
+
+  <div class="ticker-track" id="ticker-track">
+
+    <span>BTC $104K</span>
+    <span>SOL $182</span>
+    <span>ETH $2.4K</span>
+
+  </div>
+
+</div>
+
+  </header>  <!-- MAIN -->  <main><!-- HOME -->
+<section id="home-section" class="section active">
+
+  <div class="title-row">
+
+    <div>
+      <h2>🔥 Memecoins em Alta</h2>
+      <p>Rede Solana em tempo real</p>
+    </div>
+
+    <div class="live-badge">
+
+      <span class="pulse"></span>
+      LIVE
+
+    </div>
+
+  </div>
+
+  <div id="coin-grid" class="coin-grid">
+
+    <!-- cards -->
+
+  </div>
+
+</section>
+
+<!-- AIRDROP -->
+<section id="airdrops-section" class="section">
+
+  <h2>🚀 Airdrops</h2>
+
+  <div class="simple-card">
+    Novos airdrops Solana em breve.
+  </div>
+
+</section>
+
+<!-- ALPHA -->
+<section id="alpha-section" class="section">
+
+  <h2>⚡ Alpha</h2>
+
+  <div class="simple-card">
+    Tokens em tendência detectados.
+  </div>
+
+</section>
+
+<!-- SWAP -->
+<section id="swap-section" class="section">
+
+  <h2>🔄 Swap</h2>
+
+  <button id="open-jupiter" class="swap-btn">
+    Abrir Jupiter
+  </button>
+
+</section>
+
+<!-- NEWS -->
+<section id="news-section" class="section">
+
+  <h2>📰 Notícias</h2>
+
+  <div class="simple-card">
+    Notícias cripto carregando...
+  </div>
+
+</section>
+
+  </main></div><script src="app.js"></script></body>
 </html>
