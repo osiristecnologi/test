@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>Coinhat-Feeds â€” Memecoins Solana</title>
+<title>Coinhat-Feeds — Memecoins Solana</title>
 <link rel="icon" href="assets/logo.jpg" type="image/jpeg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -27,10 +27,10 @@
 </head>
 <body>
 
-<!-- â•â• TOAST â•â• -->
+<!-- TOAST -->
 <div id="toasts"></div>
 
-<!-- â•â• MENU OVERLAY â•â• -->
+<!-- MENU OVERLAY -->
 <div id="menu-overlay" class="menu-overlay">
   <div class="menu-backdrop" id="menu-backdrop"></div>
   <aside class="menu-panel">
@@ -39,28 +39,28 @@
         <img src="assets/logo.jpg" alt="Coinhat" class="menu-brand-logo"/>
         <span class="menu-brand-name">Coinhat<span style="color:var(--blue)">Feeds</span></span>
       </div>
-      <button class="menu-close-btn" id="menu-close">âœ•</button>
+      <button class="menu-close-btn" id="menu-close">✕</button>
     </div>
     <nav class="menu-nav">
-      <div class="menu-item active" data-sec="home"><span class="mi-icon">ðŸ </span><span class="mi-label">Home</span><span class="mi-arrow">â€º</span></div>
-      <div class="menu-item" data-sec="airdrops"><span class="mi-icon">ðŸš€</span><span class="mi-label">Airdrops</span><span class="mi-arrow">â€º</span></div>
-      <div class="menu-item" data-sec="alpha"><span class="mi-icon">âš¡</span><span class="mi-label">Alpha</span><span class="mi-badge">NEW</span></div>
-      <div class="menu-item" data-sec="swap"><span class="mi-icon">ðŸ”„</span><span class="mi-label">Swap</span><span class="mi-arrow">â€º</span></div>
-      <div class="menu-item" data-sec="news"><span class="mi-icon">ðŸ“°</span><span class="mi-label">NotÃ­cias</span><span class="mi-arrow">â€º</span></div>
-      <div class="menu-item" data-sec="partners"><span class="mi-icon">ðŸ’Ž</span><span class="mi-label">Parceiros</span><span class="mi-arrow">â€º</span></div>
+      <div class="menu-item active" data-sec="home"><span class="mi-icon">🏠</span><span class="mi-label">Home</span><span class="mi-arrow">›</span></div>
+      <div class="menu-item" data-sec="airdrops"><span class="mi-icon">🚀</span><span class="mi-label">Airdrops</span><span class="mi-arrow">›</span></div>
+      <div class="menu-item" data-sec="alpha"><span class="mi-icon">⚡</span><span class="mi-label">Alpha</span><span class="mi-badge">NEW</span></div>
+      <div class="menu-item" data-sec="swap"><span class="mi-icon">🔄</span><span class="mi-label">Swap</span><span class="mi-arrow">›</span></div>
+      <div class="menu-item" data-sec="news"><span class="mi-icon">📰</span><span class="mi-label">Notícias</span><span class="mi-arrow">›</span></div>
+      <div class="menu-item" data-sec="partners"><span class="mi-icon">💎</span><span class="mi-label">Parceiros</span><span class="mi-arrow">›</span></div>
     </nav>
     <div class="menu-footer">
       <p class="menu-tagline">Powered by <strong>Solana</strong></p>
       <div class="menu-socials">
-        <a href="#" class="soc-btn">ð•</a>
-        <a href="#" class="soc-btn">âœˆ</a>
-        <a href="#" class="soc-btn">ðŸ”—</a>
+        <a href="#" class="soc-btn">𝕏</a>
+        <a href="#" class="soc-btn">✈</a>
+        <a href="#" class="soc-btn">🔗</a>
       </div>
     </div>
   </aside>
 </div>
 
-<!-- â•â• TOKEN MODAL â•â• -->
+<!-- TOKEN MODAL -->
 <div id="token-modal" class="token-modal">
   <div class="modal-backdrop" id="modal-backdrop"></div>
   <div class="modal-panel">
@@ -73,41 +73,40 @@
           <div class="modal-tsym" id="m-sym"></div>
         </div>
       </div>
-      <button class="modal-close-btn" id="modal-close">âœ•</button>
+      <button class="modal-close-btn" id="modal-close">✕</button>
     </div>
     <div class="modal-body">
       <div class="modal-stats">
-        <div class="stat-box"><span class="stat-label">PreÃ§o</span><span class="stat-value" id="m-price"></span></div>
-        <div class="stat-box"><span class="stat-label">VariaÃ§Ã£o 24h</span><span class="stat-value" id="m-chg"></span></div>
+        <div class="stat-box"><span class="stat-label">Preço</span><span class="stat-value" id="m-price"></span></div>
+        <div class="stat-box"><span class="stat-label">Variação 24h</span><span class="stat-value" id="m-chg"></span></div>
         <div class="stat-box"><span class="stat-label">Market Cap</span><span class="stat-value" id="m-mcap"></span></div>
         <div class="stat-box"><span class="stat-label">Volume 24h</span><span class="stat-value" id="m-vol"></span></div>
         <div class="stat-box"><span class="stat-label">Liquidez</span><span class="stat-value" id="m-liq"></span></div>
         <div class="stat-box"><span class="stat-label">Rede</span><span class="stat-value">Solana</span></div>
       </div>
       <div class="modal-chart-wrap">
-        <div class="chart-label">ðŸ“Š GrÃ¡fico em Tempo Real â€” DexScreener</div>
+        <div class="chart-label">📊 Gráfico em Tempo Real — DexScreener</div>
         <iframe id="m-chart" class="modal-chart" src="" frameborder="0" allowtransparency="true"></iframe>
       </div>
       <div class="modal-contract">
-        <span class="contract-lbl">EndereÃ§o do Contrato</span>
+        <span class="contract-lbl">Endereço do Contrato</span>
         <div class="contract-row">
-          <span class="contract-addr" id="m-contract">â€”</span>
-          <button class="copy-btn" id="copy-contract-btn">Copiar âŽ˜</button>
+          <span class="contract-addr" id="m-contract">—</span>
+          <button class="copy-btn" id="copy-contract-btn">Copiar ⎘</button>
         </div>
-      </div>
       <div class="modal-links" id="m-links"></div>
-      <button class="swap-btn" id="modal-swap-btn"><span>ðŸ”„</span><span>Swap via Jupiter</span></button>
+      <button class="swap-btn" id="modal-swap-btn"><span>🔄</span><span>Swap via Jupiter</span></button>
     </div>
   </div>
 </div>
 
-<!-- â•â• SWAP MODAL â•â• -->
+<!-- SWAP MODAL -->
 <div id="swap-modal" class="swap-modal">
   <div class="modal-backdrop" id="swap-backdrop"></div>
   <div class="swap-panel">
     <div class="swap-head">
-      <div class="swap-head-title"><span>ðŸ”„</span> Jupiter Swap</div>
-      <button class="modal-close-btn" id="swap-close">âœ•</button>
+      <div class="swap-head-title"><span>🔄</span> Jupiter Swap</div>
+      <button class="modal-close-btn" id="swap-close">✕</button>
     </div>
     <div class="swap-body">
       <iframe id="jupiter-iframe"
@@ -119,12 +118,12 @@
   </div>
 </div>
 
-<!-- â•â• APP â•â• -->
+<!-- APP -->
 <div id="app">
   <header class="header">
     <div class="h-inner">
       <div class="h-left">
-        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        <button class="hamburger" id="hamburger"><span></span><span></span></button>
         <a href="#" class="brand">
           <img src="assets/logo.jpg" alt="Coinhat" class="brand-logo"/>
           <span class="brand-name">Coinhat<span class="brand-accent">Feeds</span></span>
@@ -132,15 +131,14 @@
       </div>
       <div class="h-right">
         <div class="search-wrap" id="search-wrap">
-          <input type="text" id="search-input" class="search-input" placeholder="Buscar tokenâ€¦" autocomplete="off"/>
-          <button class="search-btn" id="search-toggle">ðŸ”</button>
+          <input type="text" id="search-input" class="search-input" placeholder="Buscar token…" autocomplete="off"/>
+          <button class="search-btn" id="search-toggle">🔍</button>
           <div class="search-drop" id="search-drop"></div>
         </div>
       </div>
-    </div>
     <div class="ticker-bar">
       <div class="ticker-track" id="ticker-track">
-        <span style="padding:0 20px;color:var(--t3);font-size:.75rem">Carregando preÃ§osâ€¦</span>
+        <span style="padding:0 20px;color:var(--t3);font-size:.75rem">Carregando preços…</span>
       </div>
     </div>
   </header>
@@ -148,50 +146,50 @@
   <main class="main">
     <section id="sec-home" class="section active">
       <div class="sec-title-row">
-        <h1 class="sec-title">ðŸ”¥ Memecoins em Alta</h1>
+        <h1 class="sec-title">🔥 Memecoins em Alta</h1>
         <div class="live-badge"><span class="pulse-dot"></span>LIVE</div>
       </div>
-      <p class="sec-sub">Solana Network â€¢ Atualizado em tempo real</p>
+      <p class="sec-sub">Solana Network • Atualizado em tempo real</p>
       <div class="coin-grid" id="coin-grid"></div>
     </section>
 
     <section id="sec-airdrops" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">ðŸš€ Airdrops</h1></div>
-      <p class="sec-sub">Ãšltimas oportunidades na Solana</p>
+      <div class="sec-title-row"><h1 class="sec-title">🚀 Airdrops</h1></div>
+      <p class="sec-sub">Últimas oportunidades na Solana</p>
       <div id="airdrops-content" class="content-cards"></div>
     </section>
 
     <section id="sec-alpha" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">âš¡ Alpha</h1><span class="badge-new">NEW</span></div>
+      <div class="sec-title-row"><h1 class="sec-title">⚡ Alpha</h1><span class="badge-new">NEW</span></div>
       <p class="sec-sub">Sinais exclusivos da comunidade</p>
       <div id="alpha-content"></div>
     </section>
 
     <section id="sec-swap" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">ðŸ”„ Swap</h1></div>
+      <div class="sec-title-row"><h1 class="sec-title">🔄 Swap</h1></div>
       <div class="swap-section">
-        <p class="swap-section-desc">Troque tokens Solana com a melhor cotaÃ§Ã£o via Jupiter Aggregator.</p>
-        <button class="swap-btn" id="open-swap-btn" style="max-width:260px;font-size:1rem;padding:14px 28px">ðŸ”„ Abrir Jupiter Swap</button>
+        <p class="swap-section-desc">Troque tokens Solana com a melhor cotação via Jupiter Aggregator.</p>
+        <button class="swap-btn" id="open-swap-btn" style="max-width:260px;font-size:1rem;padding:14px 28px">🔄 Abrir Jupiter Swap</button>
       </div>
     </section>
 
     <section id="sec-news" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">ðŸ“° NotÃ­cias Cripto</h1></div>
-      <p class="sec-sub">As Ãºltimas do mercado</p>
+      <div class="sec-title-row"><h1 class="sec-title">📰 Notícias Cripto</h1></div>
+      <p class="sec-sub">As últimas do mercado</p>
       <div id="news-grid" class="news-grid"></div>
     </section>
 
     <section id="sec-partners" class="section">
-      <div class="sec-title-row"><h1 class="sec-title">ðŸ’Ž Parceiros</h1></div>
+      <div class="sec-title-row"><h1 class="sec-title">💎 Parceiros</h1></div>
       <p class="sec-sub">Nosso ecossistema</p>
       <div id="partners-grid" class="partners-grid"></div>
     </section>
   </main>
 
-  <footer class="footer">Â© 2025 Coinhat-Feeds â€¢ Powered by Solana â€¢ Not financial advice</footer>
+  <footer class="footer">© 2025 Coinhat-Feeds • Powered by Solana • Not financial advice</footer>
 </div>
 
-<!-- â•â• SCRIPTS (load order matters) â•â• -->
+<!-- SCRIPTS (load order matters) -->
 <script src="utils/cache.js"></script>
 <script src="utils/format.js"></script>
 <script src="utils/animations.js"></script>
@@ -210,4 +208,3 @@
 <script src="app.js"></script>
 </body>
 </html>
-
