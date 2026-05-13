@@ -1,64 +1,31 @@
-// ═════════════════════════════
-// components/swap.js
-// ═════════════════════════════
+// ═══ components/swap.js ═══
 
 const Swap = {
-
   modal: null,
 
   init() {
-
     this.modal = document.getElementById('swap-modal');
 
-    const openBtn = document.getElementById('open-swap-btn');
-    const modalSwapBtn = document.getElementById('modal-swap-btn');
+    document
+      .getElementById('open-swap-btn')
+      ?.addEventListener('click', () => this.open());
 
-    const closeBtn = document.getElementById('swap-close');
-    const backdrop = document.getElementById('swap-backdrop');
+    document
+      .getElementById('swap-close')
+      ?.addEventListener('click', () => this.close());
 
-    // Open swap
-    if (openBtn) {
-      openBtn.addEventListener('click', () => this.open());
-    }
-
-    if (modalSwapBtn) {
-      modalSwapBtn.addEventListener('click', () => this.open());
-    }
-
-    // Close swap
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.close());
-    }
-
-    // Backdrop
-    if (backdrop) {
-      backdrop.addEventListener('click', () => this.close());
-    }
-
+    document
+      .getElementById('swap-backdrop')
+      ?.addEventListener('click', () => this.close());
   },
 
   open() {
-
-    if (!this.modal) return;
-
-    this.modal.classList.add('open');
-
+    this.modal?.classList.add('open');
     document.body.style.overflow = 'hidden';
-
   },
 
   close() {
-
-    if (!this.modal) return;
-
-    this.modal.classList.remove('open');
-
+    this.modal?.classList.remove('open');
     document.body.style.overflow = '';
-
   }
-
 };
-
-// Global
-window.Swap = Swap;
-
