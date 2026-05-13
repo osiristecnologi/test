@@ -1,212 +1,468 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Coinhat-Feeds</title>  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">  <link rel="stylesheet" href="style.css">
-</head><body><!-- OVERLAY --><div id="overlay" class="overlay"></div><!-- MENU --><aside id="menu" class="menu">  <div class="menu-header">
-    <div class="brand-row">
-      <img src="./assets/logo.jpg" class="brand-logo" alt="Coinhat">
-      <h2>Coinhat<span>Feeds</span></h2>
-    </div><button id="close-menu">✕</button>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  </div>  <nav class="menu-links"><button class="menu-item active" data-section="home">
-  🏠 Home
-</button>
+  <title>Coinhat-Feeds</title>
 
-<button class="menu-item" data-section="airdrops">
-  🚀 Airdrops
-</button>
+  <meta name="theme-color" content="#0057ff" />
+  <meta name="description" content="DEX focada em memecoins Solana em tempo real." />
 
-<button class="menu-item" data-section="alpha">
-  ⚡ Alpha
-</button>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<button class="menu-item" data-section="swap">
-  🔄 Swap
-</button>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-<button class="menu-item" data-section="news">
-  📰 Notícias
-</button>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-  </nav></aside><!-- TOKEN MODAL --><div id="token-modal" class="token-modal">  <div class="token-box"><div class="token-top">
+  <!-- BACKGROUND FX -->
+  <div class="bg-blur blur-1"></div>
+  <div class="bg-blur blur-2"></div>
 
-  <div class="token-info">
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay"></div>
 
-    <img id="token-logo" src="" alt="">
+  <!-- MENU -->
+  <aside class="sidebar" id="sidebar">
 
-    <div>
-      <h2 id="token-name">Token</h2>
-      <span id="token-symbol">TKN</span>
+    <div class="sidebar-top">
+
+      <div class="brand">
+        <img src="./assets/logo.jpg" alt="Coinhat" />
+
+        <div>
+          <h2>Coinhat<span>Feeds</span></h2>
+          <p>Solana Memecoin DEX</p>
+        </div>
+      </div>
+
+      <button class="close-menu" id="close-menu">✕</button>
+
+    </div>
+
+    <nav class="menu-links">
+
+      <button class="menu-btn active" data-section="home">
+        <span>🏠</span>
+        Home
+      </button>
+
+      <button class="menu-btn" data-section="airdrops">
+        <span>🚀</span>
+        Airdrops
+      </button>
+
+      <button class="menu-btn" data-section="alpha">
+        <span>⚡</span>
+        Alpha
+      </button>
+
+      <button class="menu-btn" data-section="swap">
+        <span>🔄</span>
+        Swap
+      </button>
+
+      <button class="menu-btn" data-section="news">
+        <span>📰</span>
+        Notícias
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+
+      <div class="side-card">
+        <span class="live-dot"></span>
+        DexScreener Live
+      </div>
+
+      <div class="socials">
+        <a href="#">𝕏</a>
+        <a href="#">✈</a>
+        <a href="#">◎</a>
+      </div>
+
+    </div>
+
+  </aside>
+
+  <!-- TOKEN MODAL -->
+  <div class="token-modal" id="token-modal">
+
+    <div class="token-container">
+
+      <div class="token-header">
+
+        <div class="token-title">
+
+          <img id="token-logo" src="" alt="" />
+
+          <div>
+            <h2 id="token-name">BONK</h2>
+            <span id="token-symbol">BONK/SOL</span>
+          </div>
+
+        </div>
+
+        <button id="close-token">✕</button>
+
+      </div>
+
+      <div class="token-price-row">
+
+        <div>
+          <h1 id="token-price">$0.000012</h1>
+          <p id="token-change">+22.4%</p>
+        </div>
+
+        <button class="swap-button">
+          🔄 Swap
+        </button>
+
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-box">
+          <span>Market Cap</span>
+          <strong id="token-mcap">$12.4M</strong>
+        </div>
+
+        <div class="stat-box">
+          <span>Liquidez</span>
+          <strong id="token-liq">$1.2M</strong>
+        </div>
+
+        <div class="stat-box">
+          <span>Volume 24h</span>
+          <strong id="token-vol">$8.4M</strong>
+        </div>
+
+        <div class="stat-box">
+          <span>Holders</span>
+          <strong>12.4K</strong>
+        </div>
+
+      </div>
+
+      <div class="chart-wrapper">
+
+        <iframe
+          id="chart-frame"
+          src=""
+          frameborder="0"
+          allowfullscreen>
+        </iframe>
+
+      </div>
+
+      <div class="token-links" id="token-links">
+
+        <a href="#" class="token-link">🌐 Website</a>
+        <a href="#" class="token-link">𝕏 Twitter</a>
+        <a href="#" class="token-link">✈ Telegram</a>
+
+      </div>
+
     </div>
 
   </div>
 
-  <button id="close-token">✕</button>
+  <!-- APP -->
+  <div class="app">
 
-</div>
+    <!-- HEADER -->
+    <header class="header">
 
-<div class="token-stats">
+      <div class="header-left">
 
-  <div class="stat">
-    <span>Preço</span>
-    <strong id="token-price">$0.00</strong>
+        <button class="hamburger" id="open-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="logo-wrap">
+
+          <img src="./assets/logo.jpg" alt="Coinhat" class="logo" />
+
+          <div>
+            <h1>Coinhat<span>Feeds</span></h1>
+            <p>Memecoins Solana</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="header-right">
+
+        <div class="search-box">
+
+          <span>🔍</span>
+
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Buscar memecoin..."
+          />
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- TICKER -->
+    <section class="ticker">
+
+      <div class="ticker-track" id="ticker-track">
+
+        <span>BTC $104K ▲</span>
+        <span>SOL $182 ▲</span>
+        <span>PEPE +18%</span>
+        <span>BONK +31%</span>
+        <span>WIF +12%</span>
+        <span>MYRO +9%</span>
+
+      </div>
+
+    </section>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="hero-badge">
+          <span class="live-dot"></span>
+          LIVE SOLANA FEED
+        </div>
+
+        <h1>
+          Descubra Memecoins
+          <span>antes da explosão.</span>
+        </h1>
+
+        <p>
+          Dex focada em memecoins da rede Solana com gráficos em tempo real,
+          swap integrado via Jupiter e feed ao vivo.
+        </p>
+
+        <div class="hero-actions">
+
+          <button class="hero-btn primary">
+            🚀 Explorar Tokens
+          </button>
+
+          <button class="hero-btn secondary">
+            🔄 Abrir Swap
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="hero-card">
+
+        <div class="hero-card-top">
+          <span>🔥 Trending</span>
+          <span>LIVE</span>
+        </div>
+
+        <div class="hero-chart"></div>
+
+        <div class="hero-stats">
+
+          <div>
+            <span>Volume</span>
+            <strong>$24M</strong>
+          </div>
+
+          <div>
+            <span>Tokens</span>
+            <strong>18</strong>
+          </div>
+
+          <div>
+            <span>Chain</span>
+            <strong>Solana</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- HOME -->
+      <section class="section active" id="home-section">
+
+        <div class="section-head">
+
+          <div>
+            <h2>🔥 Memecoins em Destaque</h2>
+            <p>Top memecoins Solana em tempo real</p>
+          </div>
+
+          <button class="refresh-btn">
+            ↻ Atualizar
+          </button>
+
+        </div>
+
+        <div class="coins-grid" id="coins-grid">
+
+          <!-- CARD -->
+          <article class="coin-card">
+
+            <div class="coin-top">
+
+              <div class="coin-info">
+
+                <img src="./assets/logo.jpg" alt="token" />
+
+                <div>
+                  <h3>BONK</h3>
+                  <p>Solana</p>
+                </div>
+
+              </div>
+
+              <span class="coin-badge green">+24%</span>
+
+            </div>
+
+            <div class="coin-price">
+              $0.0000124
+            </div>
+
+            <div class="mini-chart"></div>
+
+            <div class="coin-bottom">
+
+              <div>
+                <span>Volume</span>
+                <strong>$4.2M</strong>
+              </div>
+
+              <button class="trade-btn">
+                Trade
+              </button>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+      <!-- AIRDROP -->
+      <section class="section" id="airdrops-section">
+
+        <div class="section-head">
+          <div>
+            <h2>🚀 Airdrops</h2>
+            <p>Projetos da rede Solana</p>
+          </div>
+        </div>
+
+        <div class="cards-grid">
+
+          <div class="info-card">
+            <h3>Jupiter</h3>
+            <p>Novo possível airdrop detectado.</p>
+          </div>
+
+          <div class="info-card">
+            <h3>Tensor</h3>
+            <p>Programa de recompensas ativo.</p>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ALPHA -->
+      <section class="section" id="alpha-section">
+
+        <div class="section-head">
+          <div>
+            <h2>⚡ Alpha Calls</h2>
+            <p>Tokens em tendência</p>
+          </div>
+        </div>
+
+        <div class="alpha-box">
+          <strong>$WIF</strong> aumentando liquidez rapidamente.
+        </div>
+
+      </section>
+
+      <!-- SWAP -->
+      <section class="section" id="swap-section">
+
+        <div class="section-head">
+          <div>
+            <h2>🔄 Jupiter Swap</h2>
+            <p>Swap integrado</p>
+          </div>
+        </div>
+
+        <div class="swap-container">
+
+          <iframe
+            src="https://jup.ag/swap/SOL-USDC"
+            frameborder="0">
+          </iframe>
+
+        </div>
+
+      </section>
+
+      <!-- NEWS -->
+      <section class="section" id="news-section">
+
+        <div class="section-head">
+          <div>
+            <h2>📰 Notícias</h2>
+            <p>Últimas do mercado</p>
+          </div>
+        </div>
+
+        <div class="news-grid">
+
+          <article class="news-card">
+            <span class="news-tag">SOLANA</span>
+            <h3>Memecoins voltam a subir forte.</h3>
+            <p>Mercado apresenta forte alta nas últimas horas.</p>
+          </article>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+      <p>
+        © 2025 Coinhat-Feeds — Powered by Solana
+      </p>
+
+    </footer>
+
   </div>
 
-  <div class="stat">
-    <span>24h</span>
-    <strong id="token-change">0%</strong>
-  </div>
+  <script src="app.js"></script>
 
-  <div class="stat">
-    <span>Volume</span>
-    <strong id="token-volume">$0</strong>
-  </div>
-
-  <div class="stat">
-    <span>Liquidez</span>
-    <strong id="token-liquidity">$0</strong>
-  </div>
-
-</div>
-
-<div class="chart-wrap">
-
-  <iframe
-    id="token-chart"
-    src=""
-    frameborder="0"
-    allowfullscreen>
-  </iframe>
-
-</div>
-
-<div class="token-links" id="token-links"></div>
-
-<button id="swap-btn" class="swap-btn">
-  🔄 Swap via Jupiter
-</button>
-
-  </div></div><!-- APP --><div class="app">  <!-- HEADER -->  <header class="header"><div class="header-inner">
-
-  <div class="header-left">
-
-    <button id="open-menu" class="hamburger">
-
-      <span></span>
-      <span></span>
-      <span></span>
-
-    </button>
-
-    <div class="brand">
-
-      <img src="./assets/logo.jpg" alt="Coinhat">
-
-      <h1>
-        Coinhat<span>Feeds</span>
-      </h1>
-
-    </div>
-
-  </div>
-
-  <div class="header-right">
-
-    <input
-      type="text"
-      id="search"
-      placeholder="Buscar memecoin..."
-    >
-
-  </div>
-
-</div>
-
-<!-- TICKER -->
-<div class="ticker">
-
-  <div class="ticker-track" id="ticker-track">
-
-    <span>BTC $104K</span>
-    <span>SOL $182</span>
-    <span>ETH $2.4K</span>
-
-  </div>
-
-</div>
-
-  </header>  <!-- MAIN -->  <main><!-- HOME -->
-<section id="home-section" class="section active">
-
-  <div class="title-row">
-
-    <div>
-      <h2>🔥 Memecoins em Alta</h2>
-      <p>Rede Solana em tempo real</p>
-    </div>
-
-    <div class="live-badge">
-
-      <span class="pulse"></span>
-      LIVE
-
-    </div>
-
-  </div>
-
-  <div id="coin-grid" class="coin-grid">
-
-    <!-- cards -->
-
-  </div>
-
-</section>
-
-<!-- AIRDROP -->
-<section id="airdrops-section" class="section">
-
-  <h2>🚀 Airdrops</h2>
-
-  <div class="simple-card">
-    Novos airdrops Solana em breve.
-  </div>
-
-</section>
-
-<!-- ALPHA -->
-<section id="alpha-section" class="section">
-
-  <h2>⚡ Alpha</h2>
-
-  <div class="simple-card">
-    Tokens em tendência detectados.
-  </div>
-
-</section>
-
-<!-- SWAP -->
-<section id="swap-section" class="section">
-
-  <h2>🔄 Swap</h2>
-
-  <button id="open-jupiter" class="swap-btn">
-    Abrir Jupiter
-  </button>
-
-</section>
-
-<!-- NEWS -->
-<section id="news-section" class="section">
-
-  <h2>📰 Notícias</h2>
-
-  <div class="simple-card">
-    Notícias cripto carregando...
-  </div>
-
-</section>
-
-  </main></div><script src="app.js"></script></body>
+</body>
 </html>
