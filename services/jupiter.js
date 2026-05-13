@@ -18,4 +18,4 @@ const Jupiter = {
     document.body.style.overflow = '';
   }
 };
-
+So olha para de fica vomitando codigo aqui pelo amor de Deus
