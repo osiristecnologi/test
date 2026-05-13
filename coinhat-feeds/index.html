@@ -1042,20 +1042,6 @@ img{display:block;max-width:100%}
       <div id="alpha-content" class="alpha-list"></div>
     </section>
 
-    <!-- SWAP -->
-    <section id="sec-swap" class="section">
-      <div class="sec-head"><h1 class="sec-title">🔄 Swap</h1></div>
-      <div class="swap-hero">
-        <div class="swap-hero-icon">🔄</div>
-        <div class="swap-hero-title">Jupiter Aggregator</div>
-        <div class="swap-hero-desc">Troque qualquer token Solana com a melhor cotação garantida. Zero taxas extras.</div>
-        <button class="swap-btn" id="open-swap-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          Abrir Jupiter Swap
-        </button>
-      </div>
-    </section>
-
     <!-- NEWS -->
     <section id="sec-news" class="section">
       <div class="sec-head"><h1 class="sec-title">📰 Notícias</h1></div>
@@ -1623,7 +1609,35 @@ setInterval(()=>{
 },60000);
 
 // ── INIT ──
-loadCoins();
-</script>
+  loadCoins();
+  
+  // ===== JUPITER SWAP COM REFERRAL =====
+  const jupScript = document.createElement('script');
+  jupScript.src = 'https://terminal.jup.ag/main-v3.js';
+  jupScript.onload = () => {
+    window.Jupiter.init({
+      displayMode: "integrated",
+      integratedTargetId: "jupiter-terminal",
+      endpoint: "https://api.mainnet-beta.solana.com",
+      platformFeeAndAccounts: {
+        feeBps: 50,
+        feeAccounts: {
+          "So11111111111111112": "Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie",
+          "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie"
+        }
+      },
+      formProps: {
+        initialInputMint: "So11111111111111112",
+        initialOutputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      }
+    });
+  };
+  document.head.appendChild(jupScript);
+
+  // Botão amarelo abre swap
+  document.getElementById('nav-swap-btn').addEventListener('click', () => showSection('swap'));
+  // ===== FIM JUPITER =====
+
+  </script>
 </body>
-  </html>
+           </html>
