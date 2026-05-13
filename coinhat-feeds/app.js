@@ -1,44 +1,190 @@
-// ═══ app.js ═══
-// Set logo everywhere
-const LOGO = window.COINHAT_LOGO;
-document.querySelectorAll('.brand-logo,.menu-brand-logo').forEach(el=>el.src=LOGO);
+// ===============================
+// Coinhat-Feeds — app.js
+// ===============================
 
-// Shorthand
-const $ = id => document.getElementById(id);
+// Logo global
+const LOGO = window.COINHAT_LOGO || 'assets/logo.jpg';
 
-// ── Section Router ──
+// Helper
+const $ = (id) => document.getElementById(id);
+
+// ===============================
+// Apply Logo
+// ===============================
+function applyLogos() {
+  document
+    .querySelectorAll('.brand-logo, .menu-brand-logo')
+    .forEach((el) => {
+      el.src = LOGO;
+    });
+}
+
+// ===============================
+// App Router
+// ===============================
 const App = {
-  showSection(id){
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    $('sec-'+id)?.classList.add('active');
-    if(id==='news')     News.load();
-    if(id==='airdrops') Sections.loadAirdrops();
-    if(id==='alpha')    Sections.loadAlpha();
-    if(id==='partners') Sections.loadPartners();
+
+  currentSection: 'home',
+
+  showSection(sectionId) {
+
+    this.currentSection = sectionId;
+
+    // Remove active
+    document.querySelectorAll('.section').forEach((section) => {
+      section.classList.remove('active');
+    });
+
+    // Add active
+    const target = $('sec-' + sectionId);
+
+    if (target) {
+      target.classList.add('active');
+    }
+
+    // Lazy loading sections
+    try {
+
+      switch (sectionId) {
+
+        case 'news':
+          if (typeof News !== 'undefined') {
+            News.load();
+          }
+          break;
+
+        case 'airdrops':
+          if (typeof Sections !== 'undefined') {
+            Sections.loadAirdrops();
+          }
+          break;
+
+        case 'alpha':
+          if (typeof Sections !== 'undefined') {
+            Sections.loadAlpha();
+          }
+          break;
+
+        case 'partners':
+          if (typeof Sections !== 'undefined') {
+            Sections.loadPartners();
+          }
+          break;
+
+      }
+
+    } catch (err) {
+      console.error('Section error:', err);
+    }
+
   }
+
 };
 
-// ── Init all modules ──
-Menu.init();
-Search.init();
-Modal.init();
-Swap.init();
+// ===============================
+// Initialize Modules
+// ===============================
+function initModules() {
 
-// ── Load home data ──
-Memecoins.load();
+  try {
 
-// ── Auto refresh every 60s ──
-setInterval(()=>{
-  cache.set('memecoins',null,0);
-  Memecoins.load();
-}, 60000);
+    if (typeof Menu !== 'undefined') {
+      Menu.init();
+    }
 
-// ── ESC to close any modal ──
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    Modal.close();
-    Jupiter.close();
-    Menu.close();
+    if (typeof Search !== 'undefined') {
+      Search.init();
+    }
+
+    if (typeof Modal !== 'undefined') {
+      Modal.init();
+    }
+
+    if (typeof Swap !== 'undefined') {
+      Swap.init();
+    }
+
+    if (typeof Memecoins !== 'undefined') {
+      Memecoins.load();
+    }
+
+  } catch (err) {
+    console.error('Init error:', err);
   }
-});
 
+}
+
+// ===============================
+// Auto Refresh
+// ===============================
+function startAutoRefresh() {
+
+  setInterval(() => {
+
+    try {
+
+      if (typeof cache !== 'undefined') {
+        cache.set('memecoins', null, 0);
+      }
+
+      if (typeof Memecoins !== 'undefined') {
+        Memecoins.load();
+      }
+
+    } catch (err) {
+      console.error('Refresh error:', err);
+    }
+
+  }, 60000);
+
+}
+
+// ===============================
+// Keyboard Shortcuts
+// ===============================
+function bindKeyboardEvents() {
+
+  document.addEventListener('keydown', (e) => {
+
+    if (e.key === 'Escape') {
+
+      try {
+
+        if (typeof Modal !== 'undefined') {
+          Modal.close();
+        }
+
+        if (typeof Jupiter !== 'undefined') {
+          Jupiter.close();
+        }
+
+        if (typeof Menu !== 'undefined') {
+          Menu.close();
+        }
+
+      } catch (err) {
+        console.error('Close error:', err);
+      }
+
+    }
+
+  });
+
+}
+
+// ===============================
+// App Start
+// ===============================
+window.addEventListener('DOMContentLoaded', () => {
+
+  applyLogos();
+
+  initModules();
+
+  startAutoRefresh();
+
+  bindKeyboardEvents();
+
+  console.log('🚀 Coinhat-Feeds initialized');
+
+});
