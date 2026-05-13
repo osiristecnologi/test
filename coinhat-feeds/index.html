@@ -1,468 +1,1629 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="theme-color" content="#f7c600"/>
+<title>Coinhat Feeds</title>
+<link rel="icon" href="assets/logo.jpg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   COINHAT-FEEDS v2 — App-Style UI
+   iOS/Android feel · Rounded · Premium Icons
+═══════════════════════════════════════════ */
+:root{
+  --bg:#f0f2f8;
+  --bg2:#e8ecf4;
+  --card:#ffffff;
+  --card2:#f7f9fe;
+  --yellow:#f7c600;
+  --yellow-lt:rgba(247,198,0,.12);
+  --yellow-dk:#c9a000;
+  --blue:#1a6bff;
+  --blue-lt:rgba(26,107,255,.1);
+  --green:#00c896;
+  --green-lt:rgba(0,200,150,.1);
+  --red:#ff4560;
+  --red-lt:rgba(255,69,96,.1);
+  --purple:#7c3aed;
+  --text:#0f172a;
+  --t2:#334155;
+  --t3:#64748b;
+  --t4:#94a3b8;
+  --border:rgba(15,23,42,.07);
+  --border2:rgba(15,23,42,.04);
+  --shadow-xs:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-sm:0 4px 16px rgba(0,0,0,.08);
+  --shadow-md:0 8px 32px rgba(0,0,0,.1);
+  --shadow-lg:0 16px 48px rgba(0,0,0,.14);
+  --shadow-yellow:0 8px 28px rgba(247,198,0,.35);
+  --shadow-blue:0 8px 28px rgba(26,107,255,.25);
+  --r-xs:8px;
+  --r-sm:12px;
+  --r:18px;
+  --r-lg:24px;
+  --r-xl:32px;
+  --hh:68px;
+  --nb:76px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding-bottom:calc(var(--nb) + var(--safe-bot));
+}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;-webkit-appearance:none}
+img{display:block;max-width:100%}
+::-webkit-scrollbar{width:0;height:0}
 
-  <title>Coinhat-Feeds</title>
+/* ══ TOASTS ══ */
+#toasts{
+  position:fixed;bottom:calc(var(--nb) + 16px + var(--safe-bot));
+  left:50%;transform:translateX(-50%);
+  z-index:9999;display:flex;flex-direction:column;
+  align-items:center;gap:8px;pointer-events:none;width:90vw;max-width:340px;
+}
+.toast{
+  background:rgba(15,23,42,.92);backdrop-filter:blur(16px);
+  color:#fff;padding:12px 18px;border-radius:var(--r);
+  font-size:.84rem;font-weight:500;width:100%;text-align:center;
+  pointer-events:auto;opacity:0;transform:translateY(8px) scale(.96);
+  transition:all .28s cubic-bezier(.4,0,.2,1);
+  box-shadow:var(--shadow-md);
+}
+.toast.show{opacity:1;transform:translateY(0) scale(1)}
+.toast.success{background:rgba(0,200,150,.92)}
+.toast.error{background:rgba(255,69,96,.92)}
 
-  <meta name="theme-color" content="#0057ff" />
-  <meta name="description" content="DEX focada em memecoins Solana em tempo real." />
+/* ══ HEADER ══ */
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding-top:var(--safe-top);
+  background:rgba(240,242,248,.85);
+  backdrop-filter:blur(24px) saturate(2);
+  -webkit-backdrop-filter:blur(24px) saturate(2);
+  border-bottom:1px solid var(--border2);
+}
+.h-inner{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;height:var(--hh);
+}
+.h-left{display:flex;align-items:center;gap:10px}
+.h-right{display:flex;align-items:center;gap:8px}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+/* Brand */
+.brand{display:flex;align-items:center;gap:9px}
+.brand-logo{
+  width:36px;height:36px;border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 0 2px var(--yellow),0 2px 8px rgba(247,198,0,.3);
+}
+.brand-name{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:1.12rem;letter-spacing:-.5px;line-height:1;
+  background:linear-gradient(135deg,#0f172a 0%,#1a6bff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.brand-badge{
+  font-size:.55rem;font-weight:700;letter-spacing:.8px;
+  background:var(--yellow);color:#0f172a;
+  padding:2px 5px;border-radius:4px;
+  -webkit-text-fill-color:#0f172a;vertical-align:super;margin-left:2px;
+}
 
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+/* Menu button */
+.menu-btn{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);border-radius:var(--r-sm);
+  box-shadow:var(--shadow-xs);
+  border:1px solid var(--border);
+  transition:all .2s;flex-shrink:0;
+}
+.menu-btn:active{transform:scale(.93)}
 
-  <link rel="stylesheet" href="style.css" />
+/* Search button */
+.search-btn-icon{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);border-radius:var(--r-sm);
+  box-shadow:var(--shadow-xs);border:1px solid var(--border);
+  transition:all .2s;flex-shrink:0;
+}
+.search-btn-icon:active{transform:scale(.93)}
+
+/* Search bar expand */
+.search-wrap{position:relative;display:flex;align-items:center;gap:8px}
+.search-field{
+  width:0;opacity:0;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:var(--r-sm);
+  padding:9px 12px 9px 36px;
+  font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--text);
+  outline:none;transition:width .3s cubic-bezier(.4,0,.2,1),opacity .25s;
+  pointer-events:none;
+}
+.search-wrap.open .search-field{width:190px;opacity:1;pointer-events:all;border-color:var(--blue)}
+@media(max-width:360px){.search-wrap.open .search-field{width:150px}}
+.search-field-icon{
+  position:absolute;left:10px;opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.search-wrap.open .search-field-icon{opacity:1}
+.search-drop{
+  position:absolute;top:calc(100% + 10px);right:0;width:300px;
+  background:var(--card);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lg);
+  border:1px solid var(--border);
+  overflow:hidden;display:none;z-index:300;
+}
+.search-drop.vis{display:block;animation:fadeDown .2s ease}
+.s-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;cursor:pointer;transition:background .15s;font-size:.875rem;
+}
+.s-item:hover,.s-item:active{background:var(--yellow-lt)}
+.s-item img,.s-item .s-fallback{
+  width:30px;height:30px;border-radius:50%;object-fit:cover;
+  background:var(--bg);flex-shrink:0;border:1px solid var(--border);
+}
+.s-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff}
+.s-name{font-weight:600;font-size:.88rem}
+.s-sym{color:var(--t3);font-size:.72rem}
+.s-price{margin-left:auto;font-weight:700;font-size:.82rem;color:var(--text)}
+
+/* ══ TICKER ══ */
+.ticker-wrap{
+  overflow:hidden;
+  background:linear-gradient(90deg,rgba(247,198,0,.08) 0%,rgba(247,198,0,.04) 50%,rgba(247,198,0,.08) 100%);
+  border-top:1px solid rgba(247,198,0,.15);
+  height:30px;display:flex;align-items:center;
+}
+.ticker-track{
+  display:flex;align-items:center;white-space:nowrap;
+  animation:scroll-x 40s linear infinite;
+}
+.ticker-track:hover{animation-play-state:paused}
+.t-item{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:0 16px;font-size:.75rem;font-weight:600;
+  border-right:1px solid rgba(0,0,0,.05);
+}
+.t-sym{font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem}
+.t-p{color:var(--t2)}
+.t-c{font-weight:700}
+.t-c.up{color:var(--green)}
+.t-c.dn{color:var(--red)}
+@keyframes scroll-x{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ══ BOTTOM NAV ══ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  padding-bottom:var(--safe-bot);
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(24px) saturate(2);
+  -webkit-backdrop-filter:blur(24px) saturate(2);
+  border-top:1px solid var(--border2);
+  display:flex;align-items:stretch;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;padding:8px 4px;
+  cursor:pointer;transition:all .2s;position:relative;min-height:60px;
+}
+.nav-item:active{transform:scale(.92)}
+.nav-icon{
+  width:26px;height:26px;transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-item.active .nav-icon{transform:scale(1.12)}
+.nav-label{
+  font-size:.62rem;font-weight:600;color:var(--t4);
+  transition:color .2s;letter-spacing:.2px;
+}
+.nav-item.active .nav-label{color:var(--blue)}
+.nav-item.active::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:32px;height:3px;background:var(--yellow);border-radius:0 0 4px 4px;
+}
+/* swap center button */
+.nav-item.center-btn{flex:0 0 72px}
+.nav-item.center-btn .nav-icon{
+  width:48px;height:48px;background:var(--yellow);
+  border-radius:50%;box-shadow:var(--shadow-yellow);
+  transform:translateY(-8px);
+}
+.nav-item.center-btn .nav-label{margin-top:-4px}
+.nav-item.center-btn::before{display:none}
+.nav-item.center-btn:active .nav-icon{transform:translateY(-8px) scale(.92)}
+
+/* ══ MAIN ══ */
+#app{padding-top:calc(var(--hh) + var(--safe-top) + 30px)}
+.main{padding:18px 14px 24px;max-width:900px;margin:0 auto}
+
+/* ══ SECTIONS ══ */
+.section{display:none;animation:fadeUp .3s ease}
+.section.active{display:block}
+
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sec-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:1.3rem;letter-spacing:-.4px;
+}
+.sec-actions{display:flex;align-items:center;gap:8px}
+.pill-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 12px;background:var(--card);
+  border-radius:99px;font-size:.75rem;font-weight:600;
+  box-shadow:var(--shadow-xs);border:1px solid var(--border);
+  transition:all .2s;cursor:pointer;
+}
+.pill-btn:hover{background:var(--yellow-lt);border-color:rgba(247,198,0,.3)}
+.live-dot{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.7rem;font-weight:700;color:var(--green);
+  background:var(--green-lt);padding:4px 10px;
+  border-radius:99px;letter-spacing:.4px;
+}
+.pulse{
+  width:6px;height:6px;background:var(--green);border-radius:50%;
+  animation:pulse 1.5s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,200,150,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(0,200,150,0)}}
+
+/* ══ COIN GRID ══ */
+.coin-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+@media(min-width:480px){.coin-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:700px){.coin-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1000px){.coin-grid{grid-template-columns:repeat(6,1fr)}}
+
+/* Skeleton */
+.skel{
+  height:195px;border-radius:var(--r-lg);
+  background:linear-gradient(90deg,var(--bg2) 25%,var(--card) 50%,var(--bg2) 75%);
+  background-size:300% 100%;
+  animation:shimmer 1.5s ease infinite;
+}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* Coin Card */
+.coin-card{
+  background:var(--card);
+  border-radius:var(--r-lg);
+  border:1px solid var(--border2);
+  box-shadow:var(--shadow-xs);
+  cursor:pointer;overflow:hidden;
+  transition:transform .25s cubic-bezier(.34,1.2,.64,1),box-shadow .25s;
+  position:relative;
+}
+.coin-card:hover{
+  transform:translateY(-5px) scale(1.01);
+  box-shadow:var(--shadow-md);
+}
+.coin-card:active{transform:scale(.97)}
+.card-top{padding:13px 13px 8px;display:flex;align-items:flex-start;justify-content:space-between}
+.card-logo-wrap{position:relative}
+.card-logo{
+  width:38px;height:38px;border-radius:50%;
+  object-fit:cover;background:var(--bg);
+  border:2px solid rgba(255,255,255,.8);
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+.card-logo-fb{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.82rem;color:#fff;
+  border:2px solid rgba(255,255,255,.6);
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.card-live-dot{
+  position:absolute;bottom:0;right:0;
+  width:11px;height:11px;background:var(--green);
+  border-radius:50%;border:2px solid var(--card);
+  animation:pulse 1.5s ease infinite;
+}
+.card-chg-badge{
+  font-size:.7rem;font-weight:700;
+  padding:3px 8px;border-radius:99px;
+  display:flex;align-items:center;gap:2px;
+}
+.card-chg-badge.up{background:var(--green-lt);color:var(--green)}
+.card-chg-badge.dn{background:var(--red-lt);color:var(--red)}
+.card-body{padding:0 13px 0}
+.c-name{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:1px;
+}
+.c-sym{font-size:.68rem;color:var(--t3);font-weight:500;margin-bottom:7px}
+.c-price{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:.95rem;margin-bottom:8px;
+}
+.card-stats{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:5px;margin-bottom:8px;
+}
+.cs-item{}
+.cs-lbl{font-size:.58rem;color:var(--t4);text-transform:uppercase;letter-spacing:.5px}
+.cs-val{font-size:.72rem;font-weight:600;color:var(--t2)}
+.card-spark{padding:0 0 10px}
+
+/* ══ MENU DRAWER ══ */
+.drawer-overlay{
+  position:fixed;inset:0;z-index:500;
+  visibility:hidden;pointer-events:none;
+}
+.drawer-overlay.open{visibility:visible;pointer-events:all}
+.drawer-bg{
+  position:absolute;inset:0;
+  background:rgba(15,23,42,.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;transition:opacity .3s;
+}
+.drawer-overlay.open .drawer-bg{opacity:1}
+.drawer{
+  position:absolute;top:0;left:0;bottom:0;
+  width:min(320px,88vw);
+  background:var(--card);
+  border-radius:0 var(--r-xl) var(--r-xl) 0;
+  box-shadow:var(--shadow-lg);
+  display:flex;flex-direction:column;
+  transform:translateX(-105%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.drawer-overlay.open .drawer{transform:translateX(0)}
+.drawer-header{
+  padding:calc(var(--safe-top) + 20px) 20px 16px;
+  background:linear-gradient(135deg,var(--yellow-lt),var(--blue-lt));
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.drawer-brand{display:flex;align-items:center;gap:10px}
+.drawer-logo{
+  width:42px;height:42px;border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 0 2.5px var(--yellow),var(--shadow-xs);
+}
+.drawer-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.3px}
+.drawer-close{
+  width:34px;height:34px;
+  background:rgba(255,255,255,.7);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-xs);transition:all .2s;
+}
+.drawer-close:active{transform:scale(.9)}
+.drawer-nav{flex:1;overflow-y:auto;padding:14px 12px}
+.d-item{
+  display:flex;align-items:center;gap:13px;
+  padding:13px 14px;border-radius:var(--r);
+  cursor:pointer;margin-bottom:4px;
+  transition:background .18s,transform .15s;
+  position:relative;overflow:hidden;
+}
+.d-item::after{
+  content:'';position:absolute;inset:0;
+  background:var(--yellow-lt);opacity:0;
+  border-radius:var(--r);transition:opacity .2s;
+}
+.d-item:hover::after,.d-item:active::after{opacity:1}
+.d-item.active{background:var(--yellow-lt)}
+.d-item.active::before{
+  content:'';position:absolute;left:0;top:25%;bottom:25%;
+  width:3px;background:var(--yellow);border-radius:0 3px 3px 0;
+}
+.d-icon-wrap{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);border-radius:var(--r-sm);
+  font-size:1.15rem;flex-shrink:0;
+  box-shadow:var(--shadow-xs);
+  border:1px solid var(--border2);
+  position:relative;z-index:1;
+}
+.d-item.active .d-icon-wrap{background:var(--yellow-lt);border-color:rgba(247,198,0,.3)}
+.d-label{
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:.95rem;flex:1;position:relative;z-index:1;
+}
+.d-item.active .d-label{color:var(--blue)}
+.d-badge{
+  font-size:.62rem;font-weight:700;
+  padding:2px 8px;background:var(--blue);color:#fff;
+  border-radius:99px;letter-spacing:.4px;
+  position:relative;z-index:1;
+}
+.d-arr{color:var(--t4);font-size:1rem;position:relative;z-index:1}
+.drawer-footer{
+  padding:16px 20px calc(var(--safe-bot) + 16px);
+  border-top:1px solid var(--border2);
+}
+.drawer-tagline{
+  font-size:.78rem;color:var(--t3);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.powered-logo{
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(135deg,#9945FF,#19FB9B);
+  display:inline-block;vertical-align:middle;
+}
+.drawer-socials{display:flex;gap:8px}
+.soc{
+  width:34px;height:34px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;transition:all .2s;
+}
+.soc:hover{background:var(--yellow-lt)}
+
+/* ══ TOKEN MODAL (bottom sheet) ══ */
+.token-modal{
+  position:fixed;inset:0;z-index:600;
+  visibility:hidden;pointer-events:none;
+}
+.token-modal.open{visibility:visible;pointer-events:all}
+.modal-bg{
+  position:absolute;inset:0;
+  background:rgba(15,23,42,.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:0;transition:opacity .3s;
+}
+.token-modal.open .modal-bg{opacity:1}
+.modal-sheet{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--card);
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  max-height:93vh;overflow-y:auto;
+  transform:translateY(100%);
+  transition:transform .4s cubic-bezier(.32,0,.67,0);
+  padding-bottom:calc(var(--safe-bot) + 20px);
+}
+.token-modal.open .modal-sheet{
+  transform:translateY(0);
+  transition:transform .4s cubic-bezier(.34,1.1,.64,1);
+}
+@media(min-width:680px){
+  .modal-sheet{
+    bottom:auto;top:50%;left:50%;right:auto;
+    transform:translate(-50%,calc(-50% + 30px));
+    width:min(540px,96vw);border-radius:var(--r-xl);
+    max-height:88vh;
+  }
+  .token-modal.open .modal-sheet{transform:translate(-50%,-50%)}
+}
+.modal-pull{
+  width:36px;height:4px;background:var(--bg2);
+  border-radius:99px;margin:12px auto 0;
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 10px;
+}
+.modal-tok-row{display:flex;align-items:center;gap:12px}
+.modal-logo{
+  width:48px;height:48px;border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 0 2.5px var(--yellow),var(--shadow-sm);
+}
+.modal-tname{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.18rem;
+}
+.modal-tsym{font-size:.8rem;color:var(--t3);margin-top:2px;display:flex;align-items:center;gap:5px}
+.sol-badge{
+  background:linear-gradient(135deg,#9945FF,#19FB9B);
+  color:#fff;font-size:.6rem;font-weight:700;
+  padding:1px 6px;border-radius:4px;letter-spacing:.3px;
+}
+.modal-x{
+  width:34px;height:34px;
+  background:var(--bg2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.modal-x:active{transform:scale(.9)}
+.modal-body{padding:0 16px 8px}
+.m-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;margin-bottom:14px;
+}
+.m-stat{
+  background:var(--bg);border-radius:var(--r);
+  padding:12px 10px;border:1px solid var(--border2);
+  text-align:center;
+}
+.m-slbl{
+  display:block;font-size:.6rem;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;
+}
+.m-sval{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem}
+.m-chart-wrap{
+  border-radius:var(--r-lg);overflow:hidden;
+  margin-bottom:14px;border:1px solid var(--border2);
+}
+.m-chart-label{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 14px;font-size:.75rem;font-weight:600;
+  background:var(--bg);border-bottom:1px solid var(--border2);
+}
+.m-chart{width:100%;height:280px;display:block;border:none}
+.m-contract{
+  background:var(--bg);border-radius:var(--r);
+  padding:11px 14px;margin-bottom:12px;
+  border:1px solid var(--border2);
+  display:flex;align-items:center;gap:8px;
+}
+.m-clbl{
+  font-size:.62rem;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.5px;
+  white-space:nowrap;flex-shrink:0;
+}
+.m-caddr{
+  font-size:.72rem;color:var(--t2);
+  font-family:'SF Mono','Fira Code',monospace;
+  flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.copy-btn{
+  padding:5px 10px;background:var(--yellow);
+  border-radius:var(--r-xs);font-size:.72rem;font-weight:700;
+  flex-shrink:0;transition:all .15s;
+}
+.copy-btn:active{transform:scale(.93)}
+.m-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.link-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;background:var(--blue-lt);color:var(--blue);
+  border-radius:99px;font-size:.78rem;font-weight:600;
+  transition:all .2s;border:1px solid rgba(26,107,255,.15);
+}
+.link-chip:hover,.link-chip:active{background:var(--blue);color:#fff;transform:scale(1.04)}
+.swap-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:15px;
+  background:var(--yellow);border-radius:var(--r);
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;
+  color:#0f172a;
+  box-shadow:var(--shadow-yellow);
+  transition:all .2s;
+}
+.swap-btn:hover{background:var(--yellow-dk);transform:translateY(-1px)}
+.swap-btn:active{transform:scale(.97)}
+
+/* ══ SWAP MODAL ══ */
+.swap-modal{position:fixed;inset:0;z-index:700;visibility:hidden;pointer-events:none}
+.swap-modal.open{visibility:visible;pointer-events:all}
+.swap-sheet{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--card);
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  max-height:92vh;overflow:hidden;
+  transform:translateY(100%);
+  transition:transform .4s cubic-bezier(.34,1.1,.64,1);
+  display:flex;flex-direction:column;
+  padding-bottom:var(--safe-bot);
+}
+.swap-modal.open .swap-sheet{transform:translateY(0)}
+@media(min-width:680px){
+  .swap-sheet{
+    bottom:auto;top:50%;left:50%;right:auto;
+    transform:translate(-50%,30%);width:min(520px,96vw);
+    border-radius:var(--r-xl);max-height:90vh;
+  }
+  .swap-modal.open .swap-sheet{transform:translate(-50%,-50%)}
+}
+.swap-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+}
+.swap-title{
+  font-family:'Syne',sans-serif;font-weight:700;
+  display:flex;align-items:center;gap:8px;font-size:.98rem;
+}
+.swap-body{flex:1;overflow:hidden;padding:14px}
+#jupiter-iframe{
+  width:100%;height:520px;
+  border-radius:var(--r);border:1px solid var(--border2);display:block;
+}
+
+/* ══ NEWS ══ */
+.news-grid{display:grid;gap:12px}
+@media(min-width:580px){.news-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:860px){.news-grid{grid-template-columns:repeat(3,1fr)}}
+.news-card{
+  background:var(--card);border-radius:var(--r-lg);
+  border:1px solid var(--border2);box-shadow:var(--shadow-xs);
+  overflow:hidden;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+}
+.news-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.news-card:active{transform:scale(.98)}
+.news-thumb{
+  width:100%;height:140px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;
+  background:linear-gradient(135deg,var(--blue-lt) 0%,var(--yellow-lt) 100%);
+}
+.news-content{padding:13px}
+.news-src{
+  font-size:.65rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--blue);margin-bottom:5px;
+}
+.news-ttl{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;
+  line-height:1.4;color:var(--text);margin-bottom:8px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.news-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.7rem;color:var(--t3);
+}
+.news-read{
+  color:var(--blue);font-weight:600;font-size:.72rem;
+  display:flex;align-items:center;gap:3px;
+}
+
+/* ══ CONTENT CARDS ══ */
+.content-cards{display:grid;gap:12px}
+@media(min-width:580px){.content-cards{grid-template-columns:repeat(2,1fr)}}
+.content-card{
+  background:var(--card);border-radius:var(--r-lg);
+  border:1px solid var(--border2);box-shadow:var(--shadow-xs);
+  padding:18px;display:flex;flex-direction:column;gap:10px;
+  transition:transform .2s;cursor:pointer;
+}
+.content-card:hover{transform:translateY(-3px)}
+.cc-icon-wrap{
+  width:46px;height:46px;border-radius:var(--r-sm);
+  background:var(--yellow-lt);border:1.5px solid rgba(247,198,0,.25);
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+}
+.cc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.98rem}
+.cc-desc{font-size:.83rem;color:var(--t2);line-height:1.55}
+.cc-cta{
+  align-self:flex-start;padding:8px 16px;
+  background:var(--yellow);border-radius:99px;
+  font-weight:700;font-size:.8rem;
+  transition:all .2s;box-shadow:0 3px 12px rgba(247,198,0,.3);
+}
+.cc-cta:hover{background:var(--yellow-dk);transform:translateY(-1px)}
+
+/* ══ PARTNERS ══ */
+.partners-grid{display:grid;gap:12px}
+@media(min-width:480px){.partners-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:780px){.partners-grid{grid-template-columns:repeat(3,1fr)}}
+.partner-card{
+  background:var(--card);border-radius:var(--r-lg);
+  border:1px solid var(--border2);box-shadow:var(--shadow-xs);
+  padding:20px;display:flex;flex-direction:column;
+  align-items:center;gap:10px;text-align:center;
+  transition:transform .2s,box-shadow .2s;cursor:pointer;
+}
+.partner-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.pc-icon-wrap{
+  width:56px;height:56px;border-radius:var(--r);
+  background:var(--bg);border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;
+  box-shadow:var(--shadow-xs);
+}
+.pc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.98rem}
+.pc-desc{font-size:.78rem;color:var(--t3);line-height:1.5}
+.pc-tag{
+  font-size:.65rem;padding:3px 10px;
+  background:var(--blue-lt);color:var(--blue);
+  border-radius:99px;font-weight:700;
+  border:1px solid rgba(26,107,255,.15);
+}
+
+/* ══ ALPHA ══ */
+.alpha-list{display:flex;flex-direction:column;gap:10px}
+.alpha-item{
+  background:var(--card);border-radius:var(--r-lg);
+  border:1px solid var(--border2);box-shadow:var(--shadow-xs);
+  padding:15px 16px;
+  border-left:4px solid var(--yellow);
+  transition:transform .18s;cursor:pointer;
+}
+.alpha-item:hover{transform:translateX(4px)}
+.alpha-tag{
+  font-size:.66rem;font-weight:700;text-transform:uppercase;
+  color:var(--blue);letter-spacing:.5px;margin-bottom:5px;
+}
+.alpha-text{font-size:.9rem;font-weight:600;line-height:1.5;color:var(--text)}
+.alpha-time{font-size:.72rem;color:var(--t3);margin-top:5px;display:flex;align-items:center;gap:4px}
+
+/* ══ SWAP SECTION ══ */
+.swap-hero{
+  background:linear-gradient(135deg,var(--yellow-lt),var(--blue-lt));
+  border-radius:var(--r-xl);
+  border:1px solid var(--border2);
+  padding:32px 24px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.swap-hero-icon{font-size:3rem}
+.swap-hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem}
+.swap-hero-desc{font-size:.88rem;color:var(--t2);max-width:300px;line-height:1.6}
+.swap-hero .swap-btn{max-width:240px;font-size:.98rem}
+
+/* ══ FOOTER ══ */
+.footer{
+  text-align:center;padding:16px;
+  font-size:.72rem;color:var(--t3);
+  border-top:1px solid var(--border2);margin-top:20px;
+}
+
+/* ══ MISC ══ */
+.badge-new{
+  background:var(--blue);color:#fff;
+  font-size:.6rem;font-weight:700;
+  padding:2px 8px;border-radius:99px;letter-spacing:.5px;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ SCROLLABLE TABS ══ */
+.filter-tabs{
+  display:flex;gap:8px;overflow-x:auto;
+  padding-bottom:14px;margin-bottom:4px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.filter-tabs::-webkit-scrollbar{display:none}
+.ftab{
+  flex-shrink:0;padding:7px 14px;
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:99px;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  box-shadow:var(--shadow-xs);
+}
+.ftab.active{background:var(--yellow);border-color:var(--yellow);color:#0f172a;box-shadow:var(--shadow-yellow)}
+.ftab:hover:not(.active){background:var(--yellow-lt);border-color:rgba(247,198,0,.3)}
+</style>
 </head>
 <body>
 
-  <!-- BACKGROUND FX -->
-  <div class="bg-blur blur-1"></div>
-  <div class="bg-blur blur-2"></div>
+<!-- ══ TOASTS ══ -->
+<div id="toasts"></div>
 
-  <!-- OVERLAY -->
-  <div class="overlay" id="overlay"></div>
-
-  <!-- MENU -->
-  <aside class="sidebar" id="sidebar">
-
-    <div class="sidebar-top">
-
-      <div class="brand">
-        <img src="./assets/logo.jpg" alt="Coinhat" />
-
+<!-- ══ DRAWER (MENU) ══ -->
+<div id="drawer-overlay" class="drawer-overlay">
+  <div class="drawer-bg" id="drawer-bg"></div>
+  <aside class="drawer">
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <img src="assets/logo.jpg" alt="" class="drawer-logo" id="drawer-logo"/>
         <div>
-          <h2>Coinhat<span>Feeds</span></h2>
-          <p>Solana Memecoin DEX</p>
+          <div class="drawer-brand-name">Coinhat<span style="color:var(--blue)">Feeds</span></div>
+          <div style="font-size:.72rem;color:var(--t3);margin-top:1px">Memecoins Solana</div>
         </div>
       </div>
-
-      <button class="close-menu" id="close-menu">✕</button>
-
+      <button class="drawer-close" id="drawer-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
     </div>
-
-    <nav class="menu-links">
-
-      <button class="menu-btn active" data-section="home">
-        <span>🏠</span>
-        Home
-      </button>
-
-      <button class="menu-btn" data-section="airdrops">
-        <span>🚀</span>
-        Airdrops
-      </button>
-
-      <button class="menu-btn" data-section="alpha">
-        <span>⚡</span>
-        Alpha
-      </button>
-
-      <button class="menu-btn" data-section="swap">
-        <span>🔄</span>
-        Swap
-      </button>
-
-      <button class="menu-btn" data-section="news">
-        <span>📰</span>
-        Notícias
-      </button>
-
+    <nav class="drawer-nav">
+      <div class="d-item active" data-sec="home">
+        <div class="d-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="d-label">Home</span>
+        <span class="d-arr">›</span>
+      </div>
+      <div class="d-item" data-sec="airdrops">
+        <div class="d-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="d-label">Airdrops</span>
+        <span class="d-arr">›</span>
+      </div>
+      <div class="d-item" data-sec="alpha">
+        <div class="d-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <span class="d-label">Alpha</span>
+        <span class="d-badge">NEW</span>
+      </div>
+      <div class="d-item" data-sec="swap">
+        <div class="d-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </div>
+        <span class="d-label">Swap</span>
+        <span class="d-arr">›</span>
+      </div>
+      <div class="d-item" data-sec="news">
+        <div class="d-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+        </div>
+        <span class="d-label">Notícias</span>
+        <span class="d-arr">›</span>
+      </div>
+      <div class="d-item" data-sec="partners">
+        <div class="d-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>
+        </div>
+        <span class="d-label">Parceiros</span>
+        <span class="d-arr">›</span>
+      </div>
     </nav>
-
-    <div class="sidebar-footer">
-
-      <div class="side-card">
-        <span class="live-dot"></span>
-        DexScreener Live
+    <div class="drawer-footer">
+      <div class="drawer-tagline">
+        <span class="powered-logo"></span>
+        Powered by <strong style="color:var(--purple);margin-left:3px">Solana</strong>
       </div>
-
-      <div class="socials">
-        <a href="#">𝕏</a>
-        <a href="#">✈</a>
-        <a href="#">◎</a>
+      <div class="drawer-socials">
+        <a href="#" class="soc">𝕏</a>
+        <a href="#" class="soc">✈</a>
+        <a href="#" class="soc">🔗</a>
       </div>
-
     </div>
-
   </aside>
+</div>
 
-  <!-- TOKEN MODAL -->
-  <div class="token-modal" id="token-modal">
-
-    <div class="token-container">
-
-      <div class="token-header">
-
-        <div class="token-title">
-
-          <img id="token-logo" src="" alt="" />
-
-          <div>
-            <h2 id="token-name">BONK</h2>
-            <span id="token-symbol">BONK/SOL</span>
-          </div>
-
-        </div>
-
-        <button id="close-token">✕</button>
-
-      </div>
-
-      <div class="token-price-row">
-
+<!-- ══ TOKEN MODAL ══ -->
+<div id="token-modal" class="token-modal">
+  <div class="modal-bg" id="modal-bg"></div>
+  <div class="modal-sheet">
+    <div class="modal-pull"></div>
+    <div class="modal-head">
+      <div class="modal-tok-row">
+        <img id="m-logo" src="" alt="" class="modal-logo" style="display:none"/>
+        <div id="m-logo-fb" style="width:48px;height:48px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#fff;box-shadow:0 0 0 2.5px var(--yellow)"></div>
         <div>
-          <h1 id="token-price">$0.000012</h1>
-          <p id="token-change">+22.4%</p>
+          <div class="modal-tname" id="m-name"></div>
+          <div class="modal-tsym">
+            <span id="m-sym"></span>
+            <span class="sol-badge">SOL</span>
+          </div>
         </div>
-
-        <button class="swap-button">
-          🔄 Swap
-        </button>
-
       </div>
-
-      <div class="stats-grid">
-
-        <div class="stat-box">
-          <span>Market Cap</span>
-          <strong id="token-mcap">$12.4M</strong>
-        </div>
-
-        <div class="stat-box">
-          <span>Liquidez</span>
-          <strong id="token-liq">$1.2M</strong>
-        </div>
-
-        <div class="stat-box">
-          <span>Volume 24h</span>
-          <strong id="token-vol">$8.4M</strong>
-        </div>
-
-        <div class="stat-box">
-          <span>Holders</span>
-          <strong>12.4K</strong>
-        </div>
-
-      </div>
-
-      <div class="chart-wrapper">
-
-        <iframe
-          id="chart-frame"
-          src=""
-          frameborder="0"
-          allowfullscreen>
-        </iframe>
-
-      </div>
-
-      <div class="token-links" id="token-links">
-
-        <a href="#" class="token-link">🌐 Website</a>
-        <a href="#" class="token-link">𝕏 Twitter</a>
-        <a href="#" class="token-link">✈ Telegram</a>
-
-      </div>
-
+      <button class="modal-x" id="modal-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
-
+    <div class="modal-body">
+      <div class="m-stats">
+        <div class="m-stat"><span class="m-slbl">Preço</span><span class="m-sval" id="m-price"></span></div>
+        <div class="m-stat"><span class="m-slbl">24h</span><span class="m-sval" id="m-chg"></span></div>
+        <div class="m-stat"><span class="m-slbl">Mkt Cap</span><span class="m-sval" id="m-mcap"></span></div>
+        <div class="m-stat"><span class="m-slbl">Volume</span><span class="m-sval" id="m-vol"></span></div>
+        <div class="m-stat"><span class="m-slbl">Liquidez</span><span class="m-sval" id="m-liq"></span></div>
+        <div class="m-stat"><span class="m-slbl">Rede</span><span class="m-sval">Solana</span></div>
+      </div>
+      <div class="m-chart-wrap">
+        <div class="m-chart-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Gráfico Tempo Real — DexScreener
+        </div>
+        <iframe id="m-chart" class="m-chart" src="" frameborder="0" allowtransparency="true"></iframe>
+      </div>
+      <div class="m-contract">
+        <span class="m-clbl">CA</span>
+        <span class="m-caddr" id="m-contract">—</span>
+        <button class="copy-btn" id="copy-btn">Copiar</button>
+      </div>
+      <div class="m-links" id="m-links"></div>
+      <button class="swap-btn" id="modal-swap-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        Swap via Jupiter
+      </button>
+    </div>
   </div>
+</div>
 
-  <!-- APP -->
-  <div class="app">
+<!-- ══ SWAP MODAL ══ -->
+<div id="swap-modal" class="swap-modal">
+  <div class="modal-bg" id="swap-bg"></div>
+  <div class="swap-sheet">
+    <div class="swap-head">
+      <div class="swap-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        Jupiter Swap
+        <span style="font-size:.65rem;background:var(--yellow-lt);color:var(--yellow-dk);padding:2px 7px;border-radius:99px;font-weight:700">BEST PRICE</span>
+      </div>
+      <button class="modal-x" id="swap-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="swap-body">
+      <iframe id="jupiter-iframe"
+        src="https://jup.ag/swap/SOL-USDC?referral=Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie"
+        width="100%" height="520" frameborder="0"
+        allowtransparency="true"></iframe>
+    </div>
+  </div>
+</div>
 
-    <!-- HEADER -->
-    <header class="header">
+<!-- ══ APP SHELL ══ -->
+<div id="app">
 
-      <div class="header-left">
-
-        <button class="hamburger" id="open-menu">
-          <span></span>
-          <span></span>
-          <span></span>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="h-inner">
+      <div class="h-left">
+        <button class="menu-btn" id="menu-btn" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="15" y2="18"/>
+          </svg>
         </button>
-
-        <div class="logo-wrap">
-
-          <img src="./assets/logo.jpg" alt="Coinhat" class="logo" />
-
-          <div>
-            <h1>Coinhat<span>Feeds</span></h1>
-            <p>Memecoins Solana</p>
-          </div>
-
-        </div>
-
+        <a href="#" class="brand">
+          <img src="assets/logo.jpg" alt="" class="brand-logo"/>
+          <span class="brand-name">Coinhat<span style="color:var(--blue)">Feeds</span></span>
+        </a>
       </div>
-
-      <div class="header-right">
-
-        <div class="search-box">
-
-          <span>🔍</span>
-
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Buscar memecoin..."
-          />
-
+      <div class="h-right">
+        <div class="search-wrap" id="search-wrap">
+          <span class="search-field-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </span>
+          <input class="search-field" id="search-field" type="text" placeholder="Buscar token…" autocomplete="off"/>
+          <button class="search-btn-icon" id="search-toggle" aria-label="Buscar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </button>
+          <div class="search-drop" id="search-drop"></div>
         </div>
-
       </div>
-
-    </header>
-
+    </div>
     <!-- TICKER -->
-    <section class="ticker">
-
+    <div class="ticker-wrap">
       <div class="ticker-track" id="ticker-track">
+        <span class="t-item"><span class="t-sym" style="color:var(--t3)">Carregando…</span></span>
+      </div>
+    </div>
+  </header>
 
-        <span>BTC $104K ▲</span>
-        <span>SOL $182 ▲</span>
-        <span>PEPE +18%</span>
-        <span>BONK +31%</span>
-        <span>WIF +12%</span>
-        <span>MYRO +9%</span>
+  <!-- MAIN -->
+  <main class="main">
 
+    <!-- HOME -->
+    <section id="sec-home" class="section active">
+      <div class="sec-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h1 class="sec-title">Memecoins</h1>
+          <div class="live-dot"><span class="pulse"></span>LIVE</div>
+        </div>
+        <div class="sec-actions">
+          <div class="pill-btn" id="refresh-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </div>
+        </div>
       </div>
 
+      <!-- Filter tabs -->
+      <div class="filter-tabs" id="filter-tabs">
+        <div class="ftab active" data-filter="all">🔥 Todos</div>
+        <div class="ftab" data-filter="gainers">📈 Gainers</div>
+        <div class="ftab" data-filter="losers">📉 Losers</div>
+        <div class="ftab" data-filter="volume">💧 Volume</div>
+        <div class="ftab" data-filter="new">✨ Novos</div>
+      </div>
+
+      <div class="coin-grid" id="coin-grid"></div>
     </section>
 
-    <!-- HERO -->
-    <section class="hero">
-
-      <div class="hero-content">
-
-        <div class="hero-badge">
-          <span class="live-dot"></span>
-          LIVE SOLANA FEED
-        </div>
-
-        <h1>
-          Descubra Memecoins
-          <span>antes da explosão.</span>
-        </h1>
-
-        <p>
-          Dex focada em memecoins da rede Solana com gráficos em tempo real,
-          swap integrado via Jupiter e feed ao vivo.
-        </p>
-
-        <div class="hero-actions">
-
-          <button class="hero-btn primary">
-            🚀 Explorar Tokens
-          </button>
-
-          <button class="hero-btn secondary">
-            🔄 Abrir Swap
-          </button>
-
-        </div>
-
-      </div>
-
-      <div class="hero-card">
-
-        <div class="hero-card-top">
-          <span>🔥 Trending</span>
-          <span>LIVE</span>
-        </div>
-
-        <div class="hero-chart"></div>
-
-        <div class="hero-stats">
-
-          <div>
-            <span>Volume</span>
-            <strong>$24M</strong>
-          </div>
-
-          <div>
-            <span>Tokens</span>
-            <strong>18</strong>
-          </div>
-
-          <div>
-            <span>Chain</span>
-            <strong>Solana</strong>
-          </div>
-
-        </div>
-
-      </div>
-
+    <!-- AIRDROPS -->
+    <section id="sec-airdrops" class="section">
+      <div class="sec-head"><h1 class="sec-title">🚀 Airdrops</h1></div>
+      <div id="airdrops-content" class="content-cards"></div>
     </section>
 
-    <!-- MAIN -->
-    <main class="main">
+    <!-- ALPHA -->
+    <section id="sec-alpha" class="section">
+      <div class="sec-head">
+        <h1 class="sec-title">⚡ Alpha</h1>
+        <span class="badge-new">NEW</span>
+      </div>
+      <div id="alpha-content" class="alpha-list"></div>
+    </section>
 
-      <!-- HOME -->
-      <section class="section active" id="home-section">
+    <!-- SWAP -->
+    <section id="sec-swap" class="section">
+      <div class="sec-head"><h1 class="sec-title">🔄 Swap</h1></div>
+      <div class="swap-hero">
+        <div class="swap-hero-icon">🔄</div>
+        <div class="swap-hero-title">Jupiter Aggregator</div>
+        <div class="swap-hero-desc">Troque qualquer token Solana com a melhor cotação garantida. Zero taxas extras.</div>
+        <button class="swap-btn" id="open-swap-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          Abrir Jupiter Swap
+        </button>
+      </div>
+    </section>
 
-        <div class="section-head">
+    <!-- NEWS -->
+    <section id="sec-news" class="section">
+      <div class="sec-head"><h1 class="sec-title">📰 Notícias</h1></div>
+      <div id="news-grid" class="news-grid"></div>
+    </section>
 
-          <div>
-            <h2>🔥 Memecoins em Destaque</h2>
-            <p>Top memecoins Solana em tempo real</p>
-          </div>
+    <!-- PARTNERS -->
+    <section id="sec-partners" class="section">
+      <div class="sec-head"><h1 class="sec-title">💎 Parceiros</h1></div>
+      <div id="partners-grid" class="partners-grid"></div>
+    </section>
 
-          <button class="refresh-btn">
-            ↻ Atualizar
-          </button>
+  </main>
 
-        </div>
+  <footer class="footer">© 2025 Coinhat-Feeds • Powered by Solana • Not financial advice</footer>
+</div>
 
-        <div class="coins-grid" id="coins-grid">
-
-          <!-- CARD -->
-          <article class="coin-card">
-
-            <div class="coin-top">
-
-              <div class="coin-info">
-
-                <img src="./assets/logo.jpg" alt="token" />
-
-                <div>
-                  <h3>BONK</h3>
-                  <p>Solana</p>
-                </div>
-
-              </div>
-
-              <span class="coin-badge green">+24%</span>
-
-            </div>
-
-            <div class="coin-price">
-              $0.0000124
-            </div>
-
-            <div class="mini-chart"></div>
-
-            <div class="coin-bottom">
-
-              <div>
-                <span>Volume</span>
-                <strong>$4.2M</strong>
-              </div>
-
-              <button class="trade-btn">
-                Trade
-              </button>
-
-            </div>
-
-          </article>
-
-        </div>
-
-      </section>
-
-      <!-- AIRDROP -->
-      <section class="section" id="airdrops-section">
-
-        <div class="section-head">
-          <div>
-            <h2>🚀 Airdrops</h2>
-            <p>Projetos da rede Solana</p>
-          </div>
-        </div>
-
-        <div class="cards-grid">
-
-          <div class="info-card">
-            <h3>Jupiter</h3>
-            <p>Novo possível airdrop detectado.</p>
-          </div>
-
-          <div class="info-card">
-            <h3>Tensor</h3>
-            <p>Programa de recompensas ativo.</p>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- ALPHA -->
-      <section class="section" id="alpha-section">
-
-        <div class="section-head">
-          <div>
-            <h2>⚡ Alpha Calls</h2>
-            <p>Tokens em tendência</p>
-          </div>
-        </div>
-
-        <div class="alpha-box">
-          <strong>$WIF</strong> aumentando liquidez rapidamente.
-        </div>
-
-      </section>
-
-      <!-- SWAP -->
-      <section class="section" id="swap-section">
-
-        <div class="section-head">
-          <div>
-            <h2>🔄 Jupiter Swap</h2>
-            <p>Swap integrado</p>
-          </div>
-        </div>
-
-        <div class="swap-container">
-
-          <iframe
-            src="https://jup.ag/swap/SOL-USDC"
-            frameborder="0">
-          </iframe>
-
-        </div>
-
-      </section>
-
-      <!-- NEWS -->
-      <section class="section" id="news-section">
-
-        <div class="section-head">
-          <div>
-            <h2>📰 Notícias</h2>
-            <p>Últimas do mercado</p>
-          </div>
-        </div>
-
-        <div class="news-grid">
-
-          <article class="news-card">
-            <span class="news-tag">SOLANA</span>
-            <h3>Memecoins voltam a subir forte.</h3>
-            <p>Mercado apresenta forte alta nas últimas horas.</p>
-          </article>
-
-        </div>
-
-      </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-
-      <p>
-        © 2025 Coinhat-Feeds — Powered by Solana
-      </p>
-
-    </footer>
-
+<!-- ══ BOTTOM NAV ══ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="nav-item active" data-sec="home">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <span class="nav-label">Home</span>
   </div>
+  <div class="nav-item" data-sec="news">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+    </div>
+    <span class="nav-label">Notícias</span>
+  </div>
+  <!-- CENTER SWAP BTN -->
+  <div class="nav-item center-btn" id="nav-swap-btn">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    </div>
+    <span class="nav-label">Swap</span>
+  </div>
+  <div class="nav-item" data-sec="alpha">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    </div>
+    <span class="nav-label">Alpha</span>
+  </div>
+  <div class="nav-item" data-sec="partners">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>
+    </div>
+    <span class="nav-label">Mais</span>
+  </div>
+</nav>
 
-  <script src="app.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//   COINHAT-FEEDS v2 — app.js
+// ═══════════════════════════════════════════════
+const REF = "Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie";
 
+const $ = id => document.getElementById(id);
+
+// ── FORMAT ──
+const fmt = {
+  price(n){
+    if(!n && n!==0) return'—';
+    n = parseFloat(n);
+    if(n<0.000001) return'$'+n.toExponential(2);
+    if(n<0.01) return'$'+n.toFixed(6);
+    if(n<1) return'$'+n.toFixed(4);
+    if(n<1000) return'$'+n.toFixed(3);
+    return'$'+n.toLocaleString('pt-BR',{maximumFractionDigits:2});
+  },
+  large(n){
+    if(!n) return'—';
+    if(n>=1e9) return'$'+(n/1e9).toFixed(2)+'B';
+    if(n>=1e6) return'$'+(n/1e6).toFixed(2)+'M';
+    if(n>=1e3) return'$'+(n/1e3).toFixed(1)+'K';
+    return'$'+parseFloat(n).toFixed(2);
+  },
+  pct(n){
+    if(n===undefined||n===null) return'—';
+    const v=parseFloat(n);
+    return(v>0?'+':'')+v.toFixed(2)+'%';
+  },
+  addr(a){ return a?a.slice(0,6)+'…'+a.slice(-5):'—' }
+};
+
+// ── TOAST ──
+function toast(msg,type='info'){
+  const c=$('toasts'), t=document.createElement('div');
+  t.className='toast '+type; t.textContent=msg;
+  c.appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400)},2800);
+}
+
+// ── CACHE ──
+const cache={
+  set(k,v,ttl=300000){try{localStorage.setItem('cf2_'+k,JSON.stringify({v,t:Date.now()+ttl}))}catch(e){}},
+  get(k){try{const d=JSON.parse(localStorage.getItem('cf2_'+k));if(d&&d.t>Date.now())return d.v}catch(e){}return null}
+};
+
+// ── SPARKLINE ──
+function sparkline(up,w=120,h=36){
+  const pts=[]; let y=h/2;
+  for(let i=0;i<12;i++){
+    y+=((Math.random()-.44)*(up?1.2:1))*5;
+    y=Math.max(4,Math.min(h-4,y));
+    pts.push({x:i*(w/11),y});
+  }
+  const line='M'+pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L ');
+  return{line,area:line+` L ${w},${h} L 0,${h} Z`};
+}
+
+// ── SECTION ROUTER ──
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  $('sec-'+id)?.classList.add('active');
+  // update nav items
+  document.querySelectorAll('.nav-item[data-sec]').forEach(n=>{
+    n.classList.toggle('active', n.dataset.sec===id);
+  });
+  document.querySelectorAll('.d-item[data-sec]').forEach(n=>{
+    n.classList.toggle('active', n.dataset.sec===id);
+  });
+  if(id==='news')     loadNews();
+  if(id==='airdrops') loadAirdrops();
+  if(id==='alpha')    loadAlpha();
+  if(id==='partners') loadPartners();
+}
+
+// ── DRAWER ──
+const drawerOverlay=$('drawer-overlay');
+function openDrawer(){ drawerOverlay.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeDrawer(){ drawerOverlay.classList.remove('open'); document.body.style.overflow=''; }
+$('menu-btn').addEventListener('click', openDrawer);
+$('drawer-close').addEventListener('click', closeDrawer);
+$('drawer-bg').addEventListener('click', closeDrawer);
+document.querySelectorAll('.d-item[data-sec]').forEach(el=>{
+  el.addEventListener('click',()=>{ showSection(el.dataset.sec); closeDrawer(); });
+});
+
+// ── BOTTOM NAV ──
+document.querySelectorAll('.nav-item[data-sec]').forEach(el=>{
+  el.addEventListener('click',()=>showSection(el.dataset.sec));
+});
+$('nav-swap-btn').addEventListener('click', openSwap);
+
+// ── SEARCH ──
+const searchWrap=$('search-wrap'), searchField=$('search-field'), searchDrop=$('search-drop');
+let searchTimer;
+$('search-toggle').addEventListener('click',()=>{
+  if(searchWrap.classList.toggle('open')) searchField.focus();
+  else{ searchField.value=''; searchDrop.classList.remove('vis'); }
+});
+searchField.addEventListener('input',()=>{
+  clearTimeout(searchTimer);
+  const q=searchField.value.trim();
+  if(q.length<2){ searchDrop.classList.remove('vis'); return; }
+  searchTimer=setTimeout(()=>doSearch(q),380);
+});
+document.addEventListener('click',e=>{
+  if(!searchWrap.contains(e.target)){ searchDrop.classList.remove('vis'); searchWrap.classList.remove('open'); }
+});
+
+async function doSearch(q){
+  const cached=cache.get('s_'+q);
+  if(cached){ renderSearch(cached); return; }
+  try{
+    const r=await fetch(`https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`);
+    const d=await r.json();
+    const pairs=(d.pairs||[]).filter(p=>p.chainId==='solana').slice(0,7);
+    cache.set('s_'+q,pairs,60000);
+    renderSearch(pairs);
+  }catch(e){}
+}
+function renderSearch(pairs){
+  if(!pairs.length){
+    searchDrop.innerHTML='<div class="s-item" style="color:var(--t3);justify-content:center;padding:18px">Nenhum resultado</div>';
+    searchDrop.classList.add('vis'); return;
+  }
+  const COLORS=['#f7c600','#1a6bff','#16c784','#ea3943','#9945ff','#ff6b2b','#00d4ff'];
+  searchDrop.innerHTML=pairs.map((p,i)=>{
+    const hasImg=p.info?.imageUrl;
+    const col=COLORS[i%COLORS.length];
+    const init=(p.baseToken?.symbol||'?').slice(0,2).toUpperCase();
+    return`<div class="s-item" data-idx="${i}">
+      ${hasImg
+        ?`<img src="${p.info.imageUrl}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+        :''}
+      <div class="s-fallback" style="background:${col};${hasImg?'display:none':'display:flex'}">${init}</div>
+      <div>
+        <div class="s-name">${p.baseToken?.name||'—'}</div>
+        <div class="s-sym">${p.baseToken?.symbol||''}</div>
+      </div>
+      <span class="s-price">${fmt.price(p.priceUsd)}</span>
+    </div>`;
+  }).join('');
+  searchDrop.classList.add('vis');
+  searchDrop.querySelectorAll('.s-item').forEach((el,i)=>{
+    el.addEventListener('click',()=>{
+      openModal(pairs[i]);
+      searchDrop.classList.remove('vis');
+      searchWrap.classList.remove('open');
+      searchField.value='';
+    });
+  });
+}
+
+// ── MEMECOINS ──
+const LOGO_COLORS=['#9945ff','#f7c600','#1a6bff','#16c784','#ea3943','#ff6b2b','#00d4ff','#ff2e7e','#00c896','#ffb800','#3b82f6','#10b981'];
+let allCoins=[], filteredCoins=[];
+
+function mockCoins(){
+  const d=[
+    {n:'Bonk',s:'BONK',p:0.0000248,c:12.4,mc:1580000000,v:89000000,l:12000000},
+    {n:'dogwifhat',s:'WIF',p:1.42,c:-3.2,mc:1420000000,v:134000000,l:18000000},
+    {n:'Popcat',s:'POPCAT',p:0.482,c:8.1,mc:480000000,v:42000000,l:9000000},
+    {n:'MEW',s:'MEW',p:0.00621,c:22.3,mc:620000000,v:51000000,l:7500000},
+    {n:'Fwog',s:'FWOG',p:0.083,c:-1.4,mc:83000000,v:12000000,l:4000000},
+    {n:'Retardio',s:'RETARDIO',p:0.0142,c:5.7,mc:14200000,v:3200000,l:2100000},
+    {n:'Book of Meme',s:'BOME',p:0.00902,c:-0.8,mc:380000000,v:28000000,l:8000000},
+    {n:'Silly Dragon',s:'SILLY',p:0.00421,c:14.2,mc:42100000,v:9800000,l:1900000},
+    {n:'Catwifhat',s:'CWIF',p:0.00038,c:31.0,mc:3800000,v:1200000,l:450000},
+    {n:'Peng',s:'PENG',p:0.00287,c:-5.1,mc:2870000,v:890000,l:320000},
+    {n:'Moo Deng',s:'MOODENG',p:0.00512,c:47.1,mc:51200000,v:18900000,l:3200000},
+    {n:'Goat',s:'GOAT',p:0.312,c:-2.9,mc:312000000,v:22000000,l:6700000},
+    {n:'Act I',s:'ACT',p:0.0078,c:6.2,mc:7800000,v:2100000,l:780000},
+    {n:'Zerebro',s:'ZEREBRO',p:0.0234,c:13.5,mc:23400000,v:7800000,l:1900000},
+    {n:'AI16Z',s:'AI16Z',p:0.421,c:-1.2,mc:421000000,v:31000000,l:8900000},
+    {n:'Pnut',s:'PNUT',p:0.182,c:4.8,mc:182000000,v:15400000,l:4200000},
+    {n:'Harambe',s:'HARAMBE',p:0.00193,c:9.8,mc:1930000,v:670000,l:280000},
+    {n:'Nyan Cat',s:'NYAN',p:0.00044,c:2.3,mc:4400000,v:1100000,l:550000},
+  ];
+  return d.map((m,i)=>({
+    pairAddress:'mock_'+i, chainId:'solana',
+    baseToken:{name:m.n,symbol:m.s,address:'So11111111111111111111111111111111111111'+i},
+    priceUsd:String(m.p), priceChange:{h24:m.c},
+    marketCap:m.mc, volume:{h24:m.v}, liquidity:{usd:m.l}, info:{}
+  }));
+}
+
+async function loadCoins(){
+  const grid=$('coin-grid');
+  grid.innerHTML=Array(18).fill('<div class="skel"></div>').join('');
+  let coins=cache.get('coins2');
+  if(!coins){
+    try{
+      const r=await fetch('https://api.dexscreener.com/token-boosts/top/v1');
+      const boosts=await r.json();
+      const addrs=boosts.filter(t=>t.chainId==='solana').slice(0,20).map(t=>t.tokenAddress).join(',');
+      if(addrs){
+        const r2=await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addrs}`);
+        const d2=await r2.json();
+        const seen=new Map();
+        (d2.pairs||[]).filter(p=>p.chainId==='solana').forEach(p=>{
+          const k=p.baseToken?.address; if(!k)return;
+          const liq=parseFloat(p.liquidity?.usd||0);
+          const cur=seen.get(k);
+          if(!cur||liq>parseFloat(cur.liquidity?.usd||0))seen.set(k,p);
+        });
+        coins=[...seen.values()].slice(0,18);
+      }
+      if(!coins||coins.length<6){
+        const r3=await fetch('https://api.dexscreener.com/latest/dex/search?q=solana+meme');
+        const d3=await r3.json();
+        const existing=new Set((coins||[]).map(p=>p.baseToken?.address));
+        coins=coins||[];
+        for(const p of (d3.pairs||[]).filter(p=>p.chainId==='solana')){
+          if(!existing.has(p.baseToken?.address)){coins.push(p);existing.add(p.baseToken?.address);}
+          if(coins.length>=18)break;
+        }
+      }
+      cache.set('coins2',coins,30000);
+    }catch(e){
+      coins=mockCoins();
+      toast('Modo demo — APIs offline','error');
+    }
+  }
+  allCoins=coins;
+  filteredCoins=[...coins];
+  renderCoins(filteredCoins);
+  buildTicker(coins);
+}
+
+function renderCoins(coins){
+  const grid=$('coin-grid');
+  grid.innerHTML='';
+  coins.slice(0,18).forEach((p,i)=>{
+    const price=parseFloat(p.priceUsd||0);
+    const chg=parseFloat(p.priceChange?.h24||0);
+    const up=chg>=0;
+    const col=LOGO_COLORS[i%LOGO_COLORS.length];
+    const hasImg=p.info?.imageUrl;
+    const spark=sparkline(up);
+    const card=document.createElement('div');
+    card.className='coin-card';
+    card.style.animation=`fadeUp .38s ease ${i*28}ms both`;
+    card.innerHTML=`
+      <div class="card-top">
+        <div class="card-logo-wrap">
+          ${hasImg
+            ?`<img class="card-logo" src="${p.info.imageUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            :''}
+          <div class="card-logo-fb" style="background:${col};display:${hasImg?'none':'flex'}">${(p.baseToken?.symbol||'?').slice(0,2).toUpperCase()}</div>
+          <div class="card-live-dot"></div>
+        </div>
+        <div class="card-chg-badge ${up?'up':'dn'}">
+          ${up?'▲':'▼'}${Math.abs(chg).toFixed(1)}%
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="c-name">${p.baseToken?.name||'—'}</div>
+        <div class="c-sym">${p.baseToken?.symbol||'—'}</div>
+        <div class="c-price">${fmt.price(price)}</div>
+        <div class="card-stats">
+          <div class="cs-item"><div class="cs-lbl">Mkt Cap</div><div class="cs-val">${fmt.large(p.marketCap)}</div></div>
+          <div class="cs-item"><div class="cs-lbl">Vol 24h</div><div class="cs-val">${fmt.large(p.volume?.h24)}</div></div>
+        </div>
+      </div>
+      <div class="card-spark">
+        <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="width:100%;height:38px;display:block">
+          <defs><linearGradient id="sg${i}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${up?'#00c896':'#ff4560'}" stop-opacity=".25"/>
+            <stop offset="100%" stop-color="${up?'#00c896':'#ff4560'}" stop-opacity="0"/>
+          </linearGradient></defs>
+          <path d="${spark.area}" fill="url(#sg${i})"/>
+          <path d="${spark.line}" fill="none" stroke="${up?'#00c896':'#ff4560'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>`;
+    card.addEventListener('click',()=>openModal(p));
+    grid.appendChild(card);
+  });
+}
+
+// Filter tabs
+document.querySelectorAll('.ftab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const f=tab.dataset.filter;
+    let coins=[...allCoins];
+    if(f==='gainers') coins.sort((a,b)=>parseFloat(b.priceChange?.h24||0)-parseFloat(a.priceChange?.h24||0));
+    else if(f==='losers') coins.sort((a,b)=>parseFloat(a.priceChange?.h24||0)-parseFloat(b.priceChange?.h24||0));
+    else if(f==='volume') coins.sort((a,b)=>parseFloat(b.volume?.h24||0)-parseFloat(a.volume?.h24||0));
+    else if(f==='new') coins.reverse();
+    filteredCoins=coins;
+    renderCoins(coins);
+  });
+});
+
+$('refresh-btn').addEventListener('click',()=>{
+  cache.set('coins2',null,0);
+  loadCoins();
+  toast('Atualizando preços…','info');
+});
+
+// ── TICKER ──
+async function buildTicker(coins){
+  let btc={price:67000,chg:1.2},eth={price:3400,chg:0.8},sol={price:168,chg:3.4};
+  try{
+    const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');
+    const d=await r.json();
+    d.forEach(t=>{
+      if(t.symbol==='BTCUSDT')btc={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};
+      if(t.symbol==='ETHUSDT')eth={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};
+      if(t.symbol==='SOLUSDT')sol={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};
+    });
+  }catch(e){}
+  const items=[
+    {sym:'BTC',price:btc.price,chg:btc.chg},
+    {sym:'ETH',price:eth.price,chg:eth.chg},
+    {sym:'SOL',price:sol.price,chg:sol.chg},
+    ...(coins||[]).slice(0,12).map(p=>({
+      sym:p.baseToken?.symbol||'?',
+      price:parseFloat(p.priceUsd||0),
+      chg:parseFloat(p.priceChange?.h24||0)
+    }))
+  ];
+  const html=items.map(t=>`
+    <span class="t-item">
+      <span class="t-sym">${t.sym}</span>
+      <span class="t-p">${fmt.price(t.price)}</span>
+      <span class="t-c ${t.chg>=0?'up':'dn'}">${t.chg>=0?'+':''}${(t.chg||0).toFixed(2)}%</span>
+    </span>`).join('');
+  $('ticker-track').innerHTML=html+html;
+}
+
+// ── MODAL ──
+let currentPair=null;
+function openModal(pair){
+  currentPair=pair;
+  const hasImg=pair.info?.imageUrl;
+  const logo=$('m-logo'), fb=$('m-logo-fb');
+  if(hasImg){
+    logo.src=pair.info.imageUrl;
+    logo.style.display='block'; fb.style.display='none';
+    logo.onerror=()=>{ logo.style.display='none'; fb.style.display='flex'; };
+  } else {
+    logo.style.display='none';
+    fb.style.display='flex';
+    const col=LOGO_COLORS[Math.floor(Math.random()*LOGO_COLORS.length)];
+    fb.style.background=col;
+    fb.textContent=(pair.baseToken?.symbol||'?').slice(0,2).toUpperCase();
+  }
+  $('m-name').textContent=pair.baseToken?.name||'—';
+  $('m-sym').textContent=pair.baseToken?.symbol||'';
+  $('m-price').textContent=fmt.price(pair.priceUsd);
+  const chg=parseFloat(pair.priceChange?.h24||0);
+  const mchg=$('m-chg');
+  mchg.textContent=fmt.pct(chg);
+  mchg.style.color=chg>=0?'var(--green)':'var(--red)';
+  $('m-mcap').textContent=fmt.large(pair.marketCap);
+  $('m-vol').textContent=fmt.large(pair.volume?.h24);
+  $('m-liq').textContent=fmt.large(pair.liquidity?.usd);
+  const addr=pair.baseToken?.address||pair.pairAddress||'';
+  $('m-contract').textContent=addr?fmt.addr(addr):'—';
+  $('m-contract').title=addr;
+  // Chart
+  const chartSrc=`https://dexscreener.com/solana/${pair.pairAddress}?embed=1&theme=light&info=0&trades=0`;
+  $('m-chart').src=chartSrc;
+  // Links
+  const links=[];
+  if(pair.info?.websites?.[0]) links.push({icon:'🌐',label:'Site',url:pair.info.websites[0].url});
+  (pair.info?.socials||[]).forEach(s=>{
+    if(s.type==='twitter') links.push({icon:'𝕏',label:'Twitter',url:s.url});
+    if(s.type==='telegram') links.push({icon:'✈',label:'Telegram',url:s.url});
+  });
+  $('m-links').innerHTML=links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="link-chip">${l.icon} ${l.label}</a>`).join('');
+  $('token-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  $('token-modal').classList.remove('open');
+  document.body.style.overflow='';
+  setTimeout(()=>{ $('m-chart').src=''; },400);
+}
+$('modal-close').addEventListener('click', closeModal);
+$('modal-bg').addEventListener('click', closeModal);
+$('modal-swap-btn').addEventListener('click',()=>{ closeModal(); openSwap(); });
+$('copy-btn').addEventListener('click',()=>{
+  const addr=currentPair?.baseToken?.address||currentPair?.pairAddress||'';
+  if(!addr)return;
+  navigator.clipboard?.writeText(addr)
+    .then(()=>toast('Endereço copiado!','success'))
+    .catch(()=>{ try{
+      const ta=document.createElement('textarea');
+      ta.value=addr; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      toast('Copiado!','success');
+    }catch(e){} });
+});
+
+// ── SWAP ──
+function openSwap(){
+  const sym=currentPair?.baseToken?.address||'USDC';
+  $('jupiter-iframe').src=`https://jup.ag/swap/SOL-${sym}?referral=${REF}`;
+  $('swap-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSwap(){
+  $('swap-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+$('swap-close').addEventListener('click', closeSwap);
+$('swap-bg').addEventListener('click', closeSwap);
+$('open-swap-btn').addEventListener('click', openSwap);
+
+// ── NEWS ──
+let newsLoaded=false;
+function loadNews(){
+  if(newsLoaded)return; newsLoaded=true;
+  const items=[
+    {t:'Solana bate recorde de transações com 5.000 TPS em 2025',src:'CoinDesk',time:'2h atrás',url:'https://coindesk.com',e:'📈'},
+    {t:'Memecoins Solana dominam volume em DEXs nesta semana',src:'The Block',time:'4h atrás',url:'https://theblock.co',e:'🚀'},
+    {t:'Jupiter DEX ultrapassa $1B em volume diário de swaps',src:'CryptoSlate',time:'5h atrás',url:'https://cryptoslate.com',e:'🔄'},
+    {t:'WIF e BONK lideram gainers entre memecoins do mês',src:'CoinTelegraph',time:'7h atrás',url:'https://cointelegraph.com',e:'🐕'},
+    {t:'Airdrops Solana: projetos distribuem tokens para early users',src:'Decrypt',time:'8h atrás',url:'https://decrypt.co',e:'🎁'},
+    {t:'Análise: Por que memecoins Solana superam EVM em 2025',src:'Messari',time:'12h atrás',url:'https://messari.io',e:'🧠'},
+  ];
+  $('news-grid').innerHTML=items.map((n,i)=>`
+    <div class="news-card" style="animation:fadeUp .38s ease ${i*55}ms both" onclick="window.open('${n.url}','_blank')">
+      <div class="news-thumb">${n.e}</div>
+      <div class="news-content">
+        <div class="news-src">${n.src}</div>
+        <div class="news-ttl">${n.t}</div>
+        <div class="news-foot">
+          <span>${n.time}</span>
+          <span class="news-read">Ler <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── AIRDROPS ──
+let airLoaded=false;
+function loadAirdrops(){
+  if(airLoaded)return; airLoaded=true;
+  const items=[
+    {i:'🚀',t:'Jupiter JUP Rewards',d:'Participe do programa de pontos Jupiter. Faça swaps regularmente para acumular.',btn:'Ver Detalhes',url:'https://jup.ag/?referral='+REF},
+    {i:'⭐',t:'Marginfi Season 3',d:'Deposite ativos e acumule pontos para o próximo airdrop de MRGN.',btn:'Participar',url:'https://app.marginfi.com'},
+    {i:'💧',t:'Drift Protocol',d:'Use derivativos Drift para se qualificar para distribuições futuras de DRIFT.',btn:'Acessar',url:'https://drift.trade'},
+    {i:'🌊',t:'Kamino Finance',d:'Forneça liquidez na Kamino e ganhe pontos KMNO conversíveis em tokens.',btn:'Depositar',url:'https://kamino.finance'},
+  ];
+  $('airdrops-content').innerHTML=items.map((a,i)=>`
+    <div class="content-card" style="animation:fadeUp .38s ease ${i*60}ms both" onclick="window.open('${a.url}','_blank')">
+      <div class="cc-icon-wrap">${a.i}</div>
+      <div class="cc-title">${a.t}</div>
+      <div class="cc-desc">${a.d}</div>
+      <span class="cc-cta">${a.btn} →</span>
+    </div>`).join('');
+}
+
+// ── ALPHA ──
+let alphaLoaded=false;
+function loadAlpha(){
+  if(alphaLoaded)return; alphaLoaded=true;
+  const items=[
+    {tag:'🔥 HOT CALL',text:'MOODENG/SOL mostrando breakout no gráfico 4h. Volume 3x acima da média.',time:'15 min atrás'},
+    {tag:'📊 ANÁLISE',text:'Dominância BTC abaixo de 53% — sinal histórico de alt season. Solana lidera rotação.',time:'42 min atrás'},
+    {tag:'👀 DEX ALERT',text:'Novo par na Raydium com $2M de liquidez em 30min. Contrato verificado. DYOR.',time:'1h atrás'},
+    {tag:'🚀 LAUNCH',text:'Pump.fun: token AI com 500 holders em 10min. Market cap abaixo de $500k.',time:'2h atrás'},
+    {tag:'💡 INSIGHT',text:'Baleias acumulando WIF nos últimos 3 dias. Total: +8.2M tokens. Confluência bullish.',time:'3h atrás'},
+  ];
+  $('alpha-content').innerHTML=items.map((a,i)=>`
+    <div class="alpha-item" style="animation:fadeUp .38s ease ${i*55}ms both">
+      <div class="alpha-tag">${a.tag}</div>
+      <div class="alpha-text">${a.text}</div>
+      <div class="alpha-time">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${a.time}
+      </div>
+    </div>`).join('');
+}
+
+// ── PARTNERS ──
+let partLoaded=false;
+function loadPartners(){
+  if(partLoaded)return; partLoaded=true;
+  const items=[
+    {i:'🪐',n:'Jupiter',d:'Melhor agregador DEX na Solana. Swap com os melhores preços.',t:'DEX Aggregator',u:'https://jup.ag/?referral='+REF},
+    {i:'📡',n:'DexScreener',d:'Rastreamento em tempo real de pares em todas as chains.',t:'Analytics',u:'https://dexscreener.com'},
+    {i:'👻',n:'Phantom',d:'Carteira não-custodial líder no ecossistema Solana.',t:'Wallet',u:'https://phantom.app'},
+    {i:'⚡',n:'Helius',d:'Infraestrutura RPC de alta performance para Solana.',t:'Infrastructure',u:'https://helius.dev'},
+    {i:'🦅',n:'Raydium',d:'AMM nativa da Solana com pools de liquidez profunda.',t:'AMM / DEX',u:'https://raydium.io'},
+    {i:'🌊',n:'Orca',d:'Swap intuitivo com Whirlpools de liquidez concentrada.',t:'DEX',u:'https://orca.so'},
+  ];
+  $('partners-grid').innerHTML=items.map((p,i)=>`
+    <div class="partner-card" style="animation:fadeUp .38s ease ${i*55}ms both" onclick="window.open('${p.u}','_blank')">
+      <div class="pc-icon-wrap">${p.i}</div>
+      <div class="pc-name">${p.n}</div>
+      <div class="pc-desc">${p.d}</div>
+      <span class="pc-tag">${p.t}</span>
+    </div>`).join('');
+}
+
+// ── ESC & keyboard ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ closeModal(); closeSwap(); closeDrawer(); }
+});
+
+// ── AUTO REFRESH ──
+setInterval(()=>{
+  cache.set('coins2',null,0);
+  loadCoins();
+},60000);
+
+// ── INIT ──
+loadCoins();
+</script>
 </body>
-</html>
+  </html>
