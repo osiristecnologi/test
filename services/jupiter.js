@@ -1,21 +1,46 @@
-// ═══ services/jupiter.js ═══
-const JUPITER_REF = 'Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie';
+// ═══ app.js ═══
+// Set logo everywhere
+const LOGO = window.COINHAT_LOGO;
+document.querySelectorAll('.brand-logo,.menu-brand-logo').forEach(el=>el.src=LOGO);
 
-const Jupiter = {
-  getSwapUrl(tokenAddress){
-    const sym = tokenAddress || 'USDC';
-    return `https://jup.ag/swap/SOL-${sym}?referral=${JUPITER_REF}`;
-  },
-  open(tokenAddress){
-    const iframe = document.getElementById('jupiter-iframe');
-    iframe.src = this.getSwapUrl(tokenAddress);
-    const modal = document.getElementById('swap-modal');
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  },
-  close(){
-    document.getElementById('swap-modal').classList.remove('open');
-    document.body.style.overflow = '';
+// Shorthand
+const $ = id => document.getElementById(id);
+
+// Global state
+let currentPair = null;
+
+// ── Section Router ──
+const App = {
+  showSection(id){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    $('sec-'+id)?.classList.add('active');
+    if(id==='news')     News.load();
+    if(id==='airdrops') Sections.loadAirdrops();
+    if(id==='alpha')    Sections.loadAlpha();
+    if(id==='partners') Sections.loadPartners();
   }
 };
-So olha para de fica vomitando codigo aqui pelo amor de Deus
+
+// ── Init all modules ──
+Menu.init();
+Search.init();
+Modal.init();
+Swap.init();
+
+// ── Load home data ──
+Memecoins.load();
+
+// ── Auto refresh every 60s ──
+setInterval(()=>{
+  cache.set('memecoins',null,0);
+  Memecoins.load();
+}, 60000);
+
+// ── ESC to close any modal ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    Modal.close();
+    Jupiter.close();
+    Menu.close();
+  }
+});
