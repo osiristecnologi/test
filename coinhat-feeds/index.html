@@ -1505,14 +1505,6 @@ async function openSwap(){
   } catch(e) { toast('Servidor offline','error') }
 }
 
-function closeSwap(){
-  $('swap-modal').classList.remove('open');
-  document.body.style.overflow='';
-}
-$('swap-close').addEventListener('click', closeSwap);
-$('swap-bg').addEventListener('click', closeSwap);
-$('open-swap-btn').addEventListener('click', openSwap);
-
 // ── NEWS ──
 let newsLoaded=false;
 function loadNews(){
@@ -1644,4 +1636,4 @@ setInterval(()=>{
 
   </script>
 </body>
-         </html>
+             </html>
