@@ -295,8 +295,8 @@ img{display:block;max-width:100%}
   background: #0a0a0a;
   color: #FFD700;
   text-align: center;
-  line-height:60px;
-  font-size: 14px;
+  line-height:200px;
+  font-size: 60px;
   font-weight: 700;
   z-index: 10;
 }
