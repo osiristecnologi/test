@@ -285,7 +285,21 @@ img{display:block;max-width:100%}
 .alpha-tag{font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--blue);letter-spacing:.5px;margin-bottom:4px}
 .alpha-text{font-size:.9rem;font-weight:600;line-height:1.45}
 .alpha-time{font-size:.72rem;color:var(--t3);margin-top:5tran 
-
+.iframe-wrapper::after {
+  content: "Coinhat Terminal Pro";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: #0a0a0a;
+  color: #FFD700;
+  text-align: center;
+  line-height: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 10;
+}
 
             
       
