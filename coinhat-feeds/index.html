@@ -949,10 +949,6 @@ img{display:block;max-width:100%}
       </button>
     </div>
     <div class="swap-body">
-      <iframe id="jupiter-iframe"
-        src="https://jup.ag/swap/SOL-USDC?referral=Bv9FatggxzDiWqYNEL9szrDvtmhXcx2xPeUKptGiWmie"
-        width="100%" height="520" frameborder="0"
-        allowtransparency="true"></iframe>
     </div>
   </div>
 </div>
@@ -1495,12 +1491,20 @@ $('copy-btn').addEventListener('click',()=>{
 });
 
 // ── SWAP ──
-function openSwap(){
-  const sym=currentPair?.baseToken?.address||'USDC';
-  $('jupiter-iframe').src=`https://jup.ag/swap/SOL-${sym}?referral=${REF}`;
-  $('swap-modal').classList.add('open');
-  document.body.style.overflow='hidden';
+async function openSwap(){
+  const mint = currentPair?.baseToken?.address || 'EPjFWdd5AufqSSqeM2qg'; // USDC
+  try {
+    const r = await fetch('https://coinhat.onrender.com/api/swap', {
+      method: 'POST', 
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ outputMint: mint, amount: 0.1 })
+    });
+    const d = await r.json();
+    if(d.url) window.open(d.url, '_blank');
+    else toast('Erro no swap','error');
+  } catch(e) { toast('Servidor offline','error') }
 }
+
 function closeSwap(){
   $('swap-modal').classList.remove('open');
   document.body.style.overflow='';
@@ -1640,4 +1644,4 @@ setInterval(()=>{
 
   </script>
 </body>
-           </html>
+         </html>
