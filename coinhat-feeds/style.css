@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════
+e/* ═══════════════════════════════════
    COINHAT-FEEDS — style.css
    Mobile-first · Glassmorphism · Web3
 ═══════════════════════════════════ */
@@ -297,7 +297,7 @@ img{display:block;max-width:100%}
   text-align: center;
   line-height:30px;
   font-sitrat:600px;
-  font-weight: 700;
+  font-weight: 100;
   z-index: 10;
 }
 
