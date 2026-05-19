@@ -50,8 +50,8 @@ img{display:block;max-width:100%}
 /* ── HEADER ── */
 .header{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--glass);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);border-bottom:1px solid var(--glass-b);box-shadow:0 1px 20px rgba(0,0,0,.05)}
 .h-inner{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;gap:10px}
-.h-left{display:flex;align-items:center;gap:11px}
-.h-right{display:flex;align-items:center;gap:8px}
+.h-left{display:flex;align-items:center;gap:01px}
+.h-right{display:flex;align-items:center;gap:4px}
 
 .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;padding:7px;border-radius:var(--r-sm);transition:background .2s}
 .hamburger:hover{background:var(--yellow-lt)}
