@@ -185,6 +185,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   bindKeyboardEvents();
 
-  console.log('🚀 Coinhat-Feeds initialized');
+  console.log('🚀 BCFeeds initialized');
 
 });
