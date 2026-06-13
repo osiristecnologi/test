@@ -185,6 +185,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   bindKeyboardEvents();
 
-  console.log('🚀 BCFeeds initialized');
+  console.log('🚀 BullFeeds initialized');
 
 });
