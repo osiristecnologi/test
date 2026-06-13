@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════
-   BCFEEDS — style.css
+   BullFEEDS — style.css
    Mobile-first · Glassmorphism · Web3
 ═══════════════════════════════════ */
 
@@ -286,7 +286,7 @@ img{display:block;max-width:100%}
 .alpha-text{font-size:.9rem;font-weight:600;line-height:1.45}
 .alpha-time{font-size:.72rem;color:var(--t3);margin-top:5tran 
 .iframe-wrapper::after {
-  content: "Coinhat Terminal Pro";
+  content: "bull Terminal Pro";
   position: absolute;
   bottom: 0;
   left: 0;
