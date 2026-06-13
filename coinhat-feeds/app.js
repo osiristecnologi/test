@@ -9,14 +9,26 @@ const LOGO = window.Bull_LOGO || 'assets/logo.png';
 const $ = (id) => document.getElementById(id);
 
 // ===============================
-// Apply Logo
+// Apply Favicon
 // ===============================
-function applyLogos() {
-  document
-    .querySelectorAll('.brand-logo, .menu-brand-logo')
-    .forEach((el) => {
-      el.src = LOGO;
-    });
+function applyFavicon() {
+  // Remove favicon antigo se existir
+  document.querySelectorAll("link[rel*='icon']").forEach(el => el.remove());
+  
+  // Cria o novo
+  const link = document.createElement('link');
+  link.rel = 'icon';
+  link.type = 'image/png';
+  link.href = LOGO + '?v=' + Date.now(); // bust cache
+  document.head.appendChild(link);
+}
+
+// Chama junto com applyLogos
+document.addEventListener('DOMContentLoaded', () => {
+  applyLogos();
+  applyFavicon(); // <-- adiciona essa linha
+});
+
 }
 
 // ===============================
