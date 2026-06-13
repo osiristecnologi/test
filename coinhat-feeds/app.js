@@ -3,7 +3,7 @@
 // ===============================
 
 // Logo global
-const LOGO = window.COINHAT_LOGO || 'assets/logo.jpg';
+const LOGO = window.COINHAT_LOGO || 'assets/logo.png';
 
 // Helper
 const $ = (id) => document.getElementById(id);
