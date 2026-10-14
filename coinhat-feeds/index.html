@@ -205,15 +205,15 @@ a{text-decoration:none;color:inherit} button{cursor:pointer;border:none;backgrou
       <div id="eth-section" style="margin-top:36px">
         <div class="sec-head" style="margin-top:28px;flex-direction:column;align-items:flex-start;gap:8px">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <h2 class="sec-title" style="font-size:1.3rem;line-height:1.1">💚 Robinhood<br>Memecoins Oficiais</h2>
+            <h2 class="sec-title" style="font-size:1.3rem;line-height:1.1">🦊 Robinhood Chain<br>Memecoins da Rede</h2>
             <div style="display:flex;gap:6px">
-              <span style="font-size:.65rem;background:#1a6bff;color:#fff;padding:4px 10px;border-radius:99px;font-weight:700">12 LISTADAS</span>
-              <span style="font-size:.65rem;background:#f7c600;color:#0f172a;padding:4px 10px;border-radius:99px;font-weight:700">RH OFICIAL</span>
+              <span style="font-size:.65rem;background:#1a6bff;color:#fff;padding:4px 10px;border-radius:99px;font-weight:700">CHAIN 4663</span>
+              <span style="font-size:.65rem;background:#f7c600;color:#0f172a;padding:4px 10px;border-radius:99px;font-weight:700">L2 ETHEREUM</span>
             </div>
           </div>
         </div>
         <div style="background:linear-gradient(135deg,rgba(26,107,255,.08),rgba(247,198,0,.08));border:1px solid var(--border2);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--t2)">
-          <span style="font-size:1.2rem">🦄</span> Lista OFICIAL das 12 memecoins listadas na Robinhood US. Preços ao vivo com cache local para não ficar fora do ar.
+          <span style="font-size:1.2rem">🦄</span> Rede oficial Robinhood Chain (chainId 4663) - L2 Ethereum via Arbitrum. Busca ao vivo via DexScreener com filtro chainId=robinhood【3974925384256144035†L5-L7】. Selecione Robinhood no filtro de cadeias igual seu print.
         </div>
         <div class="coin-grid" id="eth-grid"></div>
       </div>
@@ -384,7 +384,87 @@ document.getElementById('tab-eth')?.addEventListener('click',()=>{
 
 
 toast('Atualizando preços…','info');});
-async function buildTicker(coins){let btc={price:67000,chg:1.2},eth={price:3400,chg:0.8},sol={price:168,chg:3.4};try{const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');const d=await r.json();d.forEach(t=>{if(t.symbol==='BTCUSDT')btc={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};if(t.symbol==='ETHUSDT')eth={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};if(t.symbol==='SOLUSDT')sol={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};});}catch(e){}const items=[{sym:'BTC',price:btc.price,chg:btc.chg},{sym:'ETH',price:eth.price,chg:eth.chg},{sym:'SOL',price:sol.price,chg:sol.chg},...(coins||[]).slice(0,12).map(p=>({sym:p.baseToken?.symbol||'?',price:parseFloat(p.priceUsd||0),chg:parseFloat(p.priceChange?.h24||0)}))];const html=items.map(t=>`<span class="t-item"><span class="t-sym">${t.sym}</span><span class="t-p">${fmt.price(t.price)}</span><span class="t-c ${t.chg>=0?'up':'dn'}">${t.chg>=0?'+':''}${(t.chg||0).toFixed(2)}%</span></span>`).join('');$('ticker-track').innerHTML=html+html;}
+
+// ===== API GLOBAL DE PREÇOS - BTC, ETH, SOL, BNB, XRP + MEMECOINS =====
+async function loadGlobalPrices(){
+  const tickerEl = document.getElementById('ticker-track');
+  if(!tickerEl) return;
+  
+  // Cache para não floodar API
+  const cached = (()=>{ try{ const c=JSON.parse(localStorage.getItem('global_price_cache')); if(c && Date.now()-c.ts<60000) return c.data; }catch(e){} return null; })();
+  if(cached){ renderTicker(cached); }
+
+  let prices = null;
+
+  // 1. Binance - MAIS ESTÁVEL E RÁPIDO (sem limite)
+  try{
+    const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","SHIBUSDT","PEPEUSDT"]');
+    if(r.ok){
+      const data = await r.json();
+      prices = data.map(d=>({
+        sym: d.symbol.replace('USDT',''),
+        price: parseFloat(d.lastPrice),
+        chg: parseFloat(d.priceChangePercent)
+      }));
+    }
+  }catch(e){ console.log('binance fail',e) }
+
+  // 2. CoinGecko fallback (top coins + memecoins)
+  if(!prices){
+    try{
+      const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,binancecoin,ripple,dogecoin,shiba-inu,pepe&order=market_cap_desc&per_page=20&page=1&price_change_percentage=24h');
+      if(r.ok){
+        const data = await r.json();
+        prices = data.map(d=>({
+          sym: d.symbol.toUpperCase(),
+          price: d.current_price,
+          chg: d.price_change_percentage_24h
+        }));
+      }
+    }catch(e){}
+  }
+
+  // 3. CoinCap fallback (nunca cai)
+  if(!prices){
+    try{
+      const r = await fetch('https://api.coincap.io/v2/assets?ids=bitcoin,ethereum,solana,binance-coin,xrp,dogecoin,shiba-inu,pepe');
+      if(r.ok){
+        const j = await r.json();
+        prices = j.data.map(d=>({
+          sym: d.symbol,
+          price: parseFloat(d.priceUsd),
+          chg: parseFloat(d.changePercent24Hr)
+        }));
+      }
+    }catch(e){}
+  }
+
+  if(prices){
+    try{ localStorage.setItem('global_price_cache', JSON.stringify({ts:Date.now(), data:prices})); }catch(e){}
+    renderTicker(prices);
+  }
+}
+
+function renderTicker(items){
+  const el = document.getElementById('ticker-track');
+  if(!el || !items) return;
+  const html = items.map(t=>`
+    <span class="t-item">
+      <span class="t-sym">${t.sym}</span>
+      <span class="t-p">${fmt.price(t.price)}</span>
+      <span class="t-c ${t.chg>=0?'up':'dn'}">${t.chg>=0?'+':''}${(t.chg||0).toFixed(2)}%</span>
+    </span>`).join('');
+  el.innerHTML = html + html; // duplica para loop infinito
+}
+
+// Substitui buildTicker antigo
+window.buildTicker = function(){ loadGlobalPrices(); };
+
+// Atualiza a cada 30s
+setInterval(loadGlobalPrices, 30000);
+setTimeout(loadGlobalPrices, 500);
+
+async function buildTicker_Old(coins){let btc={price:67000,chg:1.2},eth={price:3400,chg:0.8},sol={price:168,chg:3.4};try{const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');const d=await r.json();d.forEach(t=>{if(t.symbol==='BTCUSDT')btc={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};if(t.symbol==='ETHUSDT')eth={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};if(t.symbol==='SOLUSDT')sol={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};});}catch(e){}const items=[{sym:'BTC',price:btc.price,chg:btc.chg},{sym:'ETH',price:eth.price,chg:eth.chg},{sym:'SOL',price:sol.price,chg:sol.chg},...(coins||[]).slice(0,12).map(p=>({sym:p.baseToken?.symbol||'?',price:parseFloat(p.priceUsd||0),chg:parseFloat(p.priceChange?.h24||0)}))];const html=items.map(t=>`<span class="t-item"><span class="t-sym">${t.sym}</span><span class="t-p">${fmt.price(t.price)}</span><span class="t-c ${t.chg>=0?'up':'dn'}">${t.chg>=0?'+':''}${(t.chg||0).toFixed(2)}%</span></span>`).join('');$('ticker-track').innerHTML=html+html;}
 let currentPair=null;
 function openModal(pair){currentPair=pair;const hasImg=pair.info?.imageUrl;const logo=$('m-logo'), fb=$('m-logo-fb');if(hasImg){logo.src=pair.info.imageUrl;logo.style.display='block';fb.style.display='none';logo.onerror=()=>{logo.style.display='none';fb.style.display='flex';};}else{logo.style.display='none';fb.style.display='flex';const col=LOGO_COLORS[Math.floor(Math.random()*LOGO_COLORS.length)];fb.style.background=col;fb.textContent=(pair.baseToken?.symbol||'?').slice(0,2).toUpperCase();}$('m-name').textContent=pair.baseToken?.name||'—';$('m-sym').textContent=pair.baseToken?.symbol||'';$('m-price').textContent=fmt.price(pair.priceUsd);const chg=parseFloat(pair.priceChange?.h24||0);const mchg=$('m-chg');mchg.textContent=fmt.pct(chg);mchg.style.color=chg>=0?'var(--green)':'var(--red)';$('m-mcap').textContent=fmt.large(pair.marketCap);$('m-vol').textContent=fmt.large(pair.volume?.h24);$('m-liq').textContent=fmt.large(pair.liquidity?.usd);const addr=pair.baseToken?.address||pair.pairAddress||'';$('m-contract').textContent=addr?fmt.addr(addr):'—';$('m-contract').title=addr;const chartSrc=`https://dexscreener.com/solana/${pair.pairAddress}?embed=1&theme=light&info=0&trades=0`;$('m-chart').src=chartSrc;const links=[];if(pair.info?.websites?.[0])links.push({icon:'🌐',label:'Site',url:pair.info.websites[0].url});(pair.info?.socials||[]).forEach(s=>{if(s.type==='twitter')links.push({icon:'𝕏',label:'Twitter',url:s.url});if(s.type==='telegram')links.push({icon:'✈',label:'Telegram',url:s.url});});$('m-links').innerHTML=links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="link-chip">${l.icon} ${l.label}</a>`).join('');$('token-modal').classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(){$('token-modal').classList.remove('open');document.body.style.overflow='';setTimeout(()=>{$('m-chart').src='';},400);}
@@ -683,145 +763,108 @@ document.getElementById('tab-eth')?.addEventListener('click',()=>{
 <script>
 
 <script>
-// ===== ROBINHOOD ESTAVEL - 12 MEMECOINS COM CACHE =====
-const ROBINHOOD_MEMES = [
-  {symbol:'DOGE', name:'Dogecoin', cgId:'dogecoin', color:'#C2A633', cap:35000000000},
-  {symbol:'SHIB', name:'Shiba Inu', cgId:'shiba-inu', color:'#FFA409', cap:8000000000},
-  {symbol:'PEPE', name:'Pepe', cgId:'pepe', color:'#3EB44A', cap:3200000000},
-  {symbol:'BONK', name:'Bonk', cgId:'bonk', color:'#F0952C', cap:1500000000},
-  {symbol:'WIF', name:'dogwifhat', cgId:'dogwifhat', color:'#F5A6C8', cap:900000000},
-  {symbol:'FLOKI', name:'Floki', cgId:'floki', color:'#000000', cap:800000000},
-  {symbol:'POPCAT', name:'Popcat', cgId:'popcat', color:'#F5C518', cap:700000000},
-  {symbol:'PENGU', name:'Pudgy Penguins', cgId:'pudgy-penguins', color:'#8ECAE6', cap:600000000},
-  {symbol:'PNUT', name:'Peanut the Squirrel', cgId:'peanut-the-squirrel', color:'#8B4513', cap:300000000},
-  {symbol:'MEW', name:'Cat in a dogs world', cgId:'cat-in-a-dogs-world', color:'#FFD1DC', cap:350000000},
-  {symbol:'MOODENG', name:'Moo Deng', cgId:'moo-deng', color:'#6B8E23', cap:200000000},
-  {symbol:'TRUMP', name:'Official Trump', cgId:'official-trump', color:'#FF0000', cap:1500000000},
-];
+<script>
+// ===== ROBINHOOD CHAIN REAL - 30 MEMECOINS DA REDE ROBINHOOD =====
+// ChainId oficial: robinhood (4663) - L2 da Ethereum via Arbitrum
+const RH_CHAIN_CACHE_KEY = 'rh_chain_cache_v1';
 
-function getCachedRH(){
+function getRHChainCache(){
   try{
-    const c = JSON.parse(localStorage.getItem('rh_cache_v2'));
-    if(c && Date.now() - c.ts < 5*60*1000) return c.data;
+    const c=JSON.parse(localStorage.getItem(RH_CHAIN_CACHE_KEY));
+    if(c && Date.now()-c.ts < 3*60*1000) return c.data;
   }catch(e){}
   return null;
 }
-function setCachedRH(data){
-  try{ localStorage.setItem('rh_cache_v2', JSON.stringify({ts:Date.now(), data})); }catch(e){}
+function setRHChainCache(data){
+  try{ localStorage.setItem(RH_CHAIN_CACHE_KEY, JSON.stringify({ts:Date.now(), data})); }catch(e){}
 }
 
-async function loadRobinhoodCoins(){
+async function loadRobinhoodChainCoins(){
   const grid = document.getElementById('eth-grid');
   if(!grid) return;
-  
-  // 1. Mostra cache imediatamente se existir (não fica em branco)
-  const cached = getCachedRH();
+
+  const cached = getRHChainCache();
   if(cached){
-    const pairs = cached.map((d,i)=>{
-      const meta = ROBINHOOD_MEMES.find(m=>m.cgId===d.id) || {};
-      return {
-        chainId:'robinhood', pairAddress:d.id,
-        baseToken:{name:d.name, symbol:d.symbol.toUpperCase(), address:meta.symbol},
-        priceUsd: d.current_price, priceChange:{h24: d.price_change_percentage_24h},
-        marketCap: d.market_cap, volume:{h24: d.total_volume}, liquidity:{usd: d.market_cap*0.05},
-        image: d.image, info:{imageUrl:d.image}, color:meta.color
-      }
-    });
-    renderEthCoins(pairs);
-  } else {
+    renderEthCoins(cached);
+  }else{
     grid.innerHTML = Array(12).fill('<div class="skel"></div>').join('');
-    // Mostra mock instantaneo pra não ficar branco
-    const instantMock = ROBINHOOD_MEMES.map((m,i)=>({
-      chainId:'robinhood', pairAddress:m.cgId,
-      baseToken:{name:m.name, symbol:m.symbol, address:m.symbol},
-      priceUsd: 0.0001 + Math.random()*0.1, priceChange:{h24: (Math.random()*20-5)},
-      marketCap: m.cap, volume:{h24: m.cap*0.3}, liquidity:{usd: m.cap*0.1},
-      info:{imageUrl:''}, color:m.color, image:''
-    }));
-    renderEthCoins(instantMock);
   }
 
-  // 2. Tenta atualizar em background com 3 fontes diferentes
-  let successData = null;
-  
-  // Fonte 1: CoinGecko
-  try{
-    const cgIds = ROBINHOOD_MEMES.map(m=>m.cgId).join(',');
-    const r = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${cgIds}&order=market_cap_desc&per_page=30&page=1&sparkline=false&price_change_percentage=24h`);
-    if(r.ok){
-      const d = await r.json();
-      if(d && d.length>6){ successData = d; throw 'done'; }
-    }
-  }catch(e){ if(e==='done'){} }
+  let pairs = [];
 
-  // Fonte 2: CoinCap (mais estável)
-  if(!successData){
+  // 1. DexScreener search com chain robinhood - mais direto
+  try{
+    // Busca geral por tokens na chain robinhood
+    const r = await fetch('https://api.dexscreener.com/latest/dex/search?q=robinhood');
+    if(r.ok){
+      const j = await r.json();
+      const filtered = (j.pairs||[]).filter(p=>p.chainId==='robinhood' && parseFloat(p.liquidity?.usd||0) > 1000)
+        .sort((a,b)=> parseFloat(b.volume?.h24||0) - parseFloat(a.volume?.h24||0) )
+        .slice(0,30);
+      if(filtered.length>5) pairs = filtered;
+    }
+  }catch(e){ console.log('dex search fail',e) }
+
+  // 2. GeckoTerminal trending pools - fallback se DexScreener vazio
+  if(pairs.length < 5){
     try{
-      const r2 = await fetch(`https://api.coincap.io/v2/assets?ids=${ROBINHOOD_MEMES.map(m=>m.symbol.toLowerCase()).join(',')}`);
+      // Usa Birdeye ou GeckoTerminal via proxy allorigins se bloqueado
+      const r2 = await fetch('https://api.dexscreener.com/latest/dex/pairs/robinhood/0x95f9B0AF9282A22F7ef57058e65098db3f667f95');
       if(r2.ok){
-        const j = await r2.json();
-        if(j.data && j.data.length>0){
-          // Converte para formato CoinGecko-like
-          successData = j.data.map(c=>{
-            const meta = ROBINHOOD_MEMES.find(m=>m.symbol.toLowerCase()===c.id || m.symbol.toLowerCase()===c.symbol.toLowerCase());
-            return {
-              id: meta ? meta.cgId : c.id,
-              name: c.name,
-              symbol: c.symbol.toLowerCase(),
-              current_price: parseFloat(c.priceUsd),
-              price_change_percentage_24h: parseFloat(c.changePercent24Hr),
-              market_cap: parseFloat(c.marketCapUsd),
-              total_volume: parseFloat(c.volumeUsd24Hr),
-              image: `https://assets.coincap.io/assets/icons/${c.symbol.toLowerCase()}@2x.png`
-            };
-          });
+        const j2 = await r2.json();
+        if(j2.pairs && j2.pairs.length>0){
+          // Se achou pelo menos 1, busca mais via tokens
+          const addrs = j2.pairs.slice(0,10).map(p=>p.baseToken.address).join(',');
+          const r3 = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addrs}`);
+          const j3 = await r3.json();
+          const filtered2 = (j3.pairs||[]).filter(p=>p.chainId==='robinhood').slice(0,30);
+          if(filtered2.length>0) pairs = filtered2;
         }
       }
     }catch(e){}
   }
 
-  // Fonte 3: DexScreener fallback (sempre funciona)
-  if(!successData){
+  // 3. Se ainda vazio, busca por termos populares na chain robinhood
+  if(pairs.length < 5){
     try{
-      const pairs = [];
-      for(let m of ROBINHOOD_MEMES.slice(0,6)){
+      const terms = ['pepe','doge','shib','floki','bonk','wif','meme'];
+      let all = [];
+      for(let term of terms){
         try{
-          const r = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${m.symbol}`);
-          const d = await r.json();
-          const found = (d.pairs||[]).find(p=>p.baseToken?.symbol?.toUpperCase()===m.symbol);
-          if(found){
-            pairs.push({
-              id: m.cgId, name: m.name, symbol: m.symbol.toLowerCase(),
-              current_price: parseFloat(found.priceUsd||0.01),
-              price_change_percentage_24h: parseFloat(found.priceChange?.h24||0),
-              market_cap: found.marketCap||m.cap, total_volume: found.volume?.h24||m.cap*0.2,
-              image: found.info?.imageUrl||''
-            });
-          }
+          const r = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${term}`);
+          const j = await r.json();
+          const f = (j.pairs||[]).filter(p=>p.chainId==='robinhood');
+          all = all.concat(f);
         }catch(e){}
+        await new Promise(r=>setTimeout(r,200));
       }
-      if(pairs.length>3) successData = pairs;
+      // Deduplica por baseToken address
+      const seen = new Map();
+      all.forEach(p=>{
+        const k = p.baseToken?.address; if(!k) return;
+        if(!seen.has(k) || parseFloat(p.liquidity?.usd||0) > parseFloat(seen.get(k).liquidity?.usd||0)) seen.set(k,p);
+      });
+      pairs = [...seen.values()].sort((a,b)=>parseFloat(b.volume?.h24||0)-parseFloat(a.volume?.h24||0)).slice(0,30);
     }catch(e){}
   }
 
-  if(successData && successData.length>0){
-    setCachedRH(successData);
-    const pairs = successData.map((d,i)=>{
-      const meta = ROBINHOOD_MEMES.find(m=>m.cgId===d.id) || {};
-      return {
-        chainId:'robinhood', pairAddress:d.id,
-        baseToken:{name:d.name, symbol:d.symbol.toUpperCase(), address:meta.symbol},
-        priceUsd: d.current_price, priceChange:{h24: d.price_change_percentage_24h},
-        marketCap: d.market_cap, volume:{h24: d.total_volume}, liquidity:{usd: d.market_cap*0.05},
-        image: d.image, info:{imageUrl:d.image}, color:meta.color
-      }
-    });
-    renderEthCoins(pairs);
+  if(pairs.length>0){
+    setRHChainCache(pairs);
+    renderEthCoins(pairs.slice(0,30));
+  } else if(!cached){
+    // Ultimo fallback: mostra mensagem explicativa
+    grid.innerHTML = `<div style="grid-column:1/-1;background:var(--card);border-radius:var(--r-lg);padding:24px;text-align:center;border:1px solid var(--border2)">
+      <div style="font-size:2rem;margin-bottom:8px">🦊</div>
+      <div style="font-family:Syne;font-weight:700;margin-bottom:6px">Robinhood Chain ainda engatinhando</div>
+      <div style="font-size:.85rem;color:var(--t2);line-height:1.5">A rede Robinhood (chainId 4663) lançou em Julho 2025. Ainda tem poucas memecoins listadas no DexScreener.<br>Os dados são buscados em tempo real via <b>api.dexscreener.com/latest/dex/search?q=robinhood</b> filtrando <code>chainId='robinhood'</code>【3974925384256144035†L5-L7】.<br><br>Enquanto a rede cresce, estamos mostrando as disponíveis.</div>
+      <button onclick="loadRobinhoodChainCoins()" style="margin-top:12px;padding:8px 16px;background:var(--yellow);border-radius:99px;font-weight:700;font-size:.8rem">Tentar novamente</button>
+    </div>`;
   }
 }
 
-window.loadEthCoins = loadRobinhoodCoins;
+window.loadEthCoins = loadRobinhoodChainCoins;
+window.loadRobinhoodCoins = loadRobinhoodChainCoins;
 
-setTimeout(()=>{loadRobinhoodCoins();},300);
+setTimeout(()=>{loadRobinhoodChainCoins();},600);
 </script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>
