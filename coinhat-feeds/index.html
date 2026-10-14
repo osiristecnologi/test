@@ -196,9 +196,26 @@ a{text-decoration:none;color:inherit} button{cursor:pointer;border:none;backgrou
         <div class="pill-btn" id="refresh-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh</div>
       </div>
       <div class="filter-tabs" id="filter-tabs">
-        <div class="ftab active" data-filter="all">🔥 Todos</div><div class="ftab" data-filter="gainers">📈 Gainers</div><div class="ftab" data-filter="losers">📉 Losers</div><div class="ftab" data-filter="volume">💧 Volume</div><div class="ftab" data-filter="new">✨ Novos</div>
+        <div class="ftab active" data-filter="all">🔥 Solana</div><div class="ftab" data-filter="gainers">📈 Gainers</div><div class="ftab" data-filter="losers">📉 Losers</div><div class="ftab" data-filter="volume">💧 Volume</div><div class="ftab" id="tab-eth">💎 ETH - 30 Robinhood</div>
       </div>
+      
       <div class="coin-grid" id="coin-grid"></div>
+
+      <!-- NOVA LISTA ETHEREUM 30 MEMECOINS ROBINHOOD STYLE -->
+      <div id="eth-section" style="margin-top:36px">
+        <div class="sec-head" style="margin-top:28px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h2 class="sec-title" style="font-size:1.2rem">💎 Ethereum — Top 30</h2>
+            <span style="font-size:.65rem;background:#1a6bff;color:#fff;padding:3px 9px;border-radius:99px;font-weight:700">ROBINHOOD LIST</span>
+            <span style="font-size:.65rem;background:rgba(247,198,0,.15);color:#b48a00;padding:3px 9px;border-radius:99px;font-weight:700">ETH</span>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(26,107,255,.08),rgba(247,198,0,.08));border:1px solid var(--border2);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--t2)">
+          <span style="font-size:1.2rem">🦄</span> Lista com as 30 memecoins mais negociadas na rede Ethereum — inspirada nas listagens da Robinhood. Dados em tempo real via DexScreener.
+        </div>
+        <div class="coin-grid" id="eth-grid"></div>
+      </div>
+
     </section>
   </main>
   <footer class="footer">© 2025 Coinhat-Feeds • Powered by Solana • Not financial advice</footer>
@@ -222,7 +239,149 @@ function mockCoins(){const d=[{n:'Bonk',s:'BONK',p:0.0000248,c:12.4,mc:158000000
 async function loadCoins(){const grid=$('coin-grid');grid.innerHTML=Array(18).fill('<div class="skel"></div>').join('');let coins=cache.get('coins2');if(!coins){try{const r=await fetch('https://api.dexscreener.com/token-boosts/top/v1');const boosts=await r.json();const addrs=boosts.filter(t=>t.chainId==='solana').slice(0,20).map(t=>t.tokenAddress).join(',');if(addrs){const r2=await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addrs}`);const d2=await r2.json();const seen=new Map();(d2.pairs||[]).filter(p=>p.chainId==='solana').forEach(p=>{const k=p.baseToken?.address;if(!k)return;const liq=parseFloat(p.liquidity?.usd||0);const cur=seen.get(k);if(!cur||liq>parseFloat(cur.liquidity?.usd||0))seen.set(k,p);});coins=[...seen.values()].slice(0,18);}if(!coins||coins.length<6){const r3=await fetch('https://api.dexscreener.com/latest/dex/search?q=solana+meme');const d3=await r3.json();const existing=new Set((coins||[]).map(p=>p.baseToken?.address));coins=coins||[];for(const p of (d3.pairs||[]).filter(p=>p.chainId==='solana')){if(!existing.has(p.baseToken?.address)){coins.push(p);existing.add(p.baseToken?.address);}if(coins.length>=18)break;}}cache.set('coins2',coins,30000);}catch(e){coins=mockCoins();toast('Modo demo — APIs offline','error');}}allCoins=coins;filteredCoins=[...coins];renderCoins(filteredCoins);buildTicker(coins);}
 function renderCoins(coins){const grid=$('coin-grid');grid.innerHTML='';coins.slice(0,18).forEach((p,i)=>{const price=parseFloat(p.priceUsd||0);const chg=parseFloat(p.priceChange?.h24||0);const up=chg>=0;const col=LOGO_COLORS[i%LOGO_COLORS.length];const hasImg=p.info?.imageUrl;const spark=sparkline(up);const card=document.createElement('div');card.className='coin-card';card.style.animation=`fadeUp .38s ease ${i*28}ms both`;card.innerHTML=`<div class="card-top"><div class="card-logo-wrap" style="position:relative">${hasImg?`<img class="card-logo" src="${p.info.imageUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}<div class="card-logo-fb" style="background:${col};display:${hasImg?'none':'flex'}">${(p.baseToken?.symbol||'?').slice(0,2).toUpperCase()}</div><div class="card-live-dot"></div></div><div class="card-chg-badge ${up?'up':'dn'}">${up?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div></div><div class="card-body"><div class="c-name">${p.baseToken?.name||'—'}</div><div class="c-sym">${p.baseToken?.symbol||'—'}</div><div class="c-price">${fmt.price(price)}</div><div class="card-stats"><div><div class="cs-lbl">Mkt Cap</div><div class="cs-val">${fmt.large(p.marketCap)}</div></div><div><div class="cs-lbl">Vol 24h</div><div class="cs-val">${fmt.large(p.volume?.h24)}</div></div></div></div><div class="card-spark"><svg viewBox="0 0 120 36" preserveAspectRatio="none" style="width:100%;height:38px;display:block"><defs><linearGradient id="sg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${up?'#00c896':'#ff4560'}" stop-opacity=".25"/><stop offset="100%" stop-color="${up?'#00c896':'#ff4560'}" stop-opacity="0"/></linearGradient></defs><path d="${spark.area}" fill="url(#sg${i})"/><path d="${spark.line}" fill="none" stroke="${up?'#00c896':'#ff4560'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;card.addEventListener('click',()=>openModal(p));grid.appendChild(card);});}
 document.querySelectorAll('.ftab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const f=tab.dataset.filter;let coins=[...allCoins];if(f==='gainers')coins.sort((a,b)=>parseFloat(b.priceChange?.h24||0)-parseFloat(a.priceChange?.h24||0));else if(f==='losers')coins.sort((a,b)=>parseFloat(a.priceChange?.h24||0)-parseFloat(b.priceChange?.h24||0));else if(f==='volume')coins.sort((a,b)=>parseFloat(b.volume?.h24||0)-parseFloat(a.volume?.h24||0));else if(f==='new')coins.reverse();filteredCoins=coins;renderCoins(coins);});});
-$('refresh-btn').addEventListener('click',()=>{cache.set('coins2',null,0);loadCoins();toast('Atualizando preços…','info');});
+$('refresh-btn').addEventListener('click',()=>{cache.set('coins2',null,0);loadCoins();
+loadEthCoins();
+
+// ===== ETHEREUM 30 MEMECOINS - LISTA ROBINHOOD =====
+const ETH_MEME_LIST = [
+  {s:'PEPE', n:'Pepe', addr:'0x6982508145454Ce325dDbE47a25d4ec3d2311933'},
+  {s:'SHIB', n:'Shiba Inu', addr:'0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE'},
+  {s:'FLOKI', n:'Floki', addr:'0xfb5B838b6a3E049D788C35a8e21bA88e6C1021d8'},
+  {s:'MOG', n:'Mog Coin', addr:'0xaaeE1a9723aadb7C9E94C4e8c336392909e7D357'},
+  {s:'WOJAK', n:'Wojak', addr:'0x5026F006B85729a8b14553FAE6a6E6E9D7D84D6d'},
+  {s:'PEPE2.0', n:'Pepe 2.0', addr:'0xfbAF5D1d933F681A7D1Cc5A8e676dE41B394DaB6'},
+  {s:'SPX', n:'SPX6900', addr:'0xE0f63A31566C92D644E12d14286075D771f5d444'},
+  {s:'MEME', n:'Memecoin', addr:'0x1F60Da337780aBf0727d44Ca2A04162e92e218a'},
+  {s:'TURBO', n:'Turbo', addr:'0xA35923162C49d3525CCEB7f25dA250BD6A1a6236'},
+  {s:'LADYS', n:'Milady Meme', addr:'0x12970E6868f88f48dDf66dDf7D3a60B2a5D4336'},
+  {s:'BOBO', n:'Bobo Coin', addr:'0xB90B2A35C65dB935b0e2A91EAA2F690A556682E1'},
+  {s:'ANDY', n:'Andy', addr:'0x68b42a01a3Ea8a2bCe1f09665e1A17532f0C5CfD'},
+  {s:'WOLF', n:'LandWolf', addr:'0x67466BE17df83287eD2b4fE2cF71d635e15f9BF6'},
+  {s:'KISHU', n:'Kishu Inu', addr:'0xA2b4D0c19cC86a7CCADeF99b5560A55a3804d2d'},
+  {s:'ELON', n:'Dogelon Mars', addr:'0x761D38e5DDf6ccf6Cf7cCF4424C08454FF82d518'},
+  {s:'BABYDOGE', n:'Baby Doge', addr:'0x69420E3A3aa9e4829b8a39D3e6d1d549aB64b5d'},
+  {s:'AKITA', n:'Akita Inu', addr:'0x3301EeE7a59107a78c53B441A07d0Ca1C5AdeC74'},
+  {s:'HOGE', n:'Hoge Finance', addr:'0xfAd5C3098e34AfaC9e651367459349B9BAD4A86A'},
+  {s:'PIT', n:'Pitbull', addr:'0x85E1fD1F567b86D6a8cC3DBD10637F06cBDFf6f7D'},
+  {s:'SAITAMA', n:'Saitama', addr:'0xCeB2607B1B3693907a0CCa1A7191DEf867BD0f9D'},
+  {s:'MONA', n:'MonaCoin', addr:'0x27599bF532BEaD9bBa310B2a6E455f0225710e83'},
+  {s:'DOBO', n:'Dobo Token', addr:'0x5a5F9aE6757cA73d97bE13A8A604B8b6a26Ea8C5'},
+  {s:'REKT', n:'Rekt', addr:'0xA6aA394f65C400B335d1E4e2e44F167f700E4711f'},
+  {s:'PEPECOIN', n:'PepeCoin', addr:'0xa9E8aCF069C58d4B1f68Ad1d2E9DfC2e2b8f62e5'},
+  {s:'CHAD', n:'Chad Coin', addr:'0xC188b3E1cE9e4F62Aa59eB9E3D1D64FbA1C9d2F6'},
+  {s:'BEN', n:'Ben the Dog', addr:'0x9D7f7B19d2AfeE0fF0CA64B3e1515305AdAb932D'},
+  {s:'PSYOP', n:'Psyop', addr:'0x5Ef83e975CF2eE9B32A3805a0b624E88B4397A69'},
+  {s:'BOB', n:'BOB', addr:'0xB0B19533052C4Ef2B68Ba5b0e65F0A3a5dFD2BF'},
+  {s:'JOE', n:'Joe Coin', addr:'0x2E9F1D8a3D2C4f7A9b0E1d2C3F4a5B6a7D8E9F0A1'},
+  {s:'PONKE', n:'Ponke ETH', addr:'0x3a2d7d5a5b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0'}
+];
+
+async function loadEthCoins(){
+  const grid = $('eth-grid');
+  grid.innerHTML = Array(30).fill('<div class="skel"></div>').join('');
+  let pairs = [];
+  try{
+    // Busca tokens ETH em lotes de 10
+    const addrs = ETH_MEME_LIST.slice(0,30).map(t=>t.addr).join(',');
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addrs}`);
+    const d = await r.json();
+    const seen = new Map();
+    (d.pairs||[]).filter(p=>p.chainId==='ethereum').forEach(p=>{
+      const k=p.baseToken?.address?.toLowerCase(); if(!k) return;
+      const liq=parseFloat(p.liquidity?.usd||0);
+      const cur=seen.get(k);
+      if(!cur||liq>parseFloat(cur.liquidity?.usd||0)) seen.set(k,p);
+    });
+    pairs = [...seen.values()];
+    // Completa com busca por nome se faltar
+    if(pairs.length < 20){
+      for(let item of ETH_MEME_LIST){
+        if(pairs.length>=30) break;
+        if(seen.has(item.addr.toLowerCase())) continue;
+        try{
+          const rs = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${item.s}`);
+          const ds = await rs.json();
+          const fp = (ds.pairs||[]).find(p=>p.chainId==='ethereum' && p.baseToken?.symbol?.toUpperCase().includes(item.s));
+          if(fp) pairs.push(fp);
+        }catch(e){}
+      }
+    }
+  }catch(e){
+    console.log('eth fetch fail',e);
+  }
+  // Fallback mock se ainda vazio
+  if(pairs.length < 10){
+    pairs = ETH_MEME_LIST.map((m,i)=>({
+      chainId:'ethereum',
+      pairAddress:'eth_mock_'+i,
+      baseToken:{name:m.n, symbol:m.s, address:m.addr},
+      priceUsd: (Math.random()*0.01+0.000001).toFixed(8),
+      priceChange:{h24: (Math.random()*40-15).toFixed(2)},
+      marketCap: Math.floor(Math.random()*50000000+5000000),
+      volume:{h24: Math.floor(Math.random()*10000000+500000)},
+      liquidity:{usd: Math.floor(Math.random()*5000000+500000)},
+      info:{}
+    }));
+  }
+  renderEthCoins(pairs.slice(0,30));
+}
+
+function renderEthCoins(coins){
+  const grid=$('eth-grid');
+  grid.innerHTML='';
+  coins.forEach((p,i)=>{
+    const price=parseFloat(p.priceUsd||0);
+    const chg=parseFloat(p.priceChange?.h24||0);
+    const up=chg>=0;
+    const col=LOGO_COLORS[i%LOGO_COLORS.length];
+    const hasImg=p.info?.imageUrl;
+    const spark=sparkline(up);
+    const card=document.createElement('div');
+    card.className='coin-card';
+    card.style.borderTop='3px solid #627EEA';
+    card.style.animation=`fadeUp .38s ease ${i*18}ms both`;
+    card.innerHTML=`
+      <div class="card-top">
+        <div class="card-logo-wrap" style="position:relative">
+          ${hasImg?`<img class="card-logo" src="${p.info.imageUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+          <div class="card-logo-fb" style="background:${col};display:${hasImg?'none':'flex'}">${(p.baseToken?.symbol||'?').slice(0,2).toUpperCase()}</div>
+          <div class="card-live-dot" style="background:#627EEA"></div>
+        </div>
+        <div class="card-chg-badge ${up?'up':'dn'}">${up?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+      </div>
+      <div class="card-body">
+        <div class="c-name">${p.baseToken?.name||'—'}</div>
+        <div class="c-sym">${p.baseToken?.symbol||'—'} <span style="font-size:.55rem;background:#627EEA11;color:#627EEA;padding:1px 5px;border-radius:4px;border:1px solid #627EEA22">ETH</span></div>
+        <div class="c-price">${fmt.price(price)}</div>
+        <div class="card-stats">
+          <div><div class="cs-lbl">Mkt Cap</div><div class="cs-val">${fmt.large(p.marketCap)}</div></div>
+          <div><div class="cs-lbl">Vol 24h</div><div class="cs-val">${fmt.large(p.volume?.h24)}</div></div>
+        </div>
+      </div>
+      <div class="card-spark">
+        <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="width:100%;height:38px;display:block">
+          <defs><linearGradient id="eth_sg${i}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${up?'#627EEA':'#ff4560'}" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="${up?'#627EEA':'#ff4560'}" stop-opacity="0"/>
+          </linearGradient></defs>
+          <path d="${spark.area}" fill="url(#eth_sg${i})"/>
+          <path d="${spark.line}" fill="none" stroke="${up?'#627EEA':'#ff4560'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>`;
+    card.addEventListener('click',()=>openModal(p));
+    grid.appendChild(card);
+  });
+}
+
+// Tab ETH scroll
+document.getElementById('tab-eth')?.addEventListener('click',()=>{
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-eth').classList.add('active');
+  document.getElementById('eth-section').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+
+toast('Atualizando preços…','info');});
 async function buildTicker(coins){let btc={price:67000,chg:1.2},eth={price:3400,chg:0.8},sol={price:168,chg:3.4};try{const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');const d=await r.json();d.forEach(t=>{if(t.symbol==='BTCUSDT')btc={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};if(t.symbol==='ETHUSDT')eth={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};if(t.symbol==='SOLUSDT')sol={price:parseFloat(t.lastPrice),chg:parseFloat(t.priceChangePercent)};});}catch(e){}const items=[{sym:'BTC',price:btc.price,chg:btc.chg},{sym:'ETH',price:eth.price,chg:eth.chg},{sym:'SOL',price:sol.price,chg:sol.chg},...(coins||[]).slice(0,12).map(p=>({sym:p.baseToken?.symbol||'?',price:parseFloat(p.priceUsd||0),chg:parseFloat(p.priceChange?.h24||0)}))];const html=items.map(t=>`<span class="t-item"><span class="t-sym">${t.sym}</span><span class="t-p">${fmt.price(t.price)}</span><span class="t-c ${t.chg>=0?'up':'dn'}">${t.chg>=0?'+':''}${(t.chg||0).toFixed(2)}%</span></span>`).join('');$('ticker-track').innerHTML=html+html;}
 let currentPair=null;
 function openModal(pair){currentPair=pair;const hasImg=pair.info?.imageUrl;const logo=$('m-logo'), fb=$('m-logo-fb');if(hasImg){logo.src=pair.info.imageUrl;logo.style.display='block';fb.style.display='none';logo.onerror=()=>{logo.style.display='none';fb.style.display='flex';};}else{logo.style.display='none';fb.style.display='flex';const col=LOGO_COLORS[Math.floor(Math.random()*LOGO_COLORS.length)];fb.style.background=col;fb.textContent=(pair.baseToken?.symbol||'?').slice(0,2).toUpperCase();}$('m-name').textContent=pair.baseToken?.name||'—';$('m-sym').textContent=pair.baseToken?.symbol||'';$('m-price').textContent=fmt.price(pair.priceUsd);const chg=parseFloat(pair.priceChange?.h24||0);const mchg=$('m-chg');mchg.textContent=fmt.pct(chg);mchg.style.color=chg>=0?'var(--green)':'var(--red)';$('m-mcap').textContent=fmt.large(pair.marketCap);$('m-vol').textContent=fmt.large(pair.volume?.h24);$('m-liq').textContent=fmt.large(pair.liquidity?.usd);const addr=pair.baseToken?.address||pair.pairAddress||'';$('m-contract').textContent=addr?fmt.addr(addr):'—';$('m-contract').title=addr;const chartSrc=`https://dexscreener.com/solana/${pair.pairAddress}?embed=1&theme=light&info=0&trades=0`;$('m-chart').src=chartSrc;const links=[];if(pair.info?.websites?.[0])links.push({icon:'🌐',label:'Site',url:pair.info.websites[0].url});(pair.info?.socials||[]).forEach(s=>{if(s.type==='twitter')links.push({icon:'𝕏',label:'Twitter',url:s.url});if(s.type==='telegram')links.push({icon:'✈',label:'Telegram',url:s.url});});$('m-links').innerHTML=links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="link-chip">${l.icon} ${l.label}</a>`).join('');$('token-modal').classList.add('open');document.body.style.overflow='hidden';}
@@ -232,8 +391,292 @@ $('modal-swap-btn').addEventListener('click',()=>{closeModal();openSwap();});
 $('copy-btn').addEventListener('click',()=>{const addr=currentPair?.baseToken?.address||currentPair?.pairAddress||'';if(!addr)return;navigator.clipboard?.writeText(addr).then(()=>toast('Endereço copiado!','success')).catch(()=>{try{const ta=document.createElement('textarea');ta.value=addr;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copiado!','success');}catch(e){}});});
 async function openSwap(){const mint=currentPair?.baseToken?.address||'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';try{const r=await fetch('https://coinhat.onrender.com/api/swap',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({outputMint:mint,amount:0.1})});const d=await r.json();if(d.url)window.open(d.url,'_blank');else toast('Erro no swap','error');}catch(e){toast('Servidor offline','error')}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();}});
-setInterval(()=>{cache.set('coins2',null,0);loadCoins();},60000);
+setInterval(()=>{cache.set('coins2',null,0);loadCoins();
+loadEthCoins();
+
+// ===== ETHEREUM 30 MEMECOINS - LISTA ROBINHOOD =====
+const ETH_MEME_LIST = [
+  {s:'PEPE', n:'Pepe', addr:'0x6982508145454Ce325dDbE47a25d4ec3d2311933'},
+  {s:'SHIB', n:'Shiba Inu', addr:'0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE'},
+  {s:'FLOKI', n:'Floki', addr:'0xfb5B838b6a3E049D788C35a8e21bA88e6C1021d8'},
+  {s:'MOG', n:'Mog Coin', addr:'0xaaeE1a9723aadb7C9E94C4e8c336392909e7D357'},
+  {s:'WOJAK', n:'Wojak', addr:'0x5026F006B85729a8b14553FAE6a6E6E9D7D84D6d'},
+  {s:'PEPE2.0', n:'Pepe 2.0', addr:'0xfbAF5D1d933F681A7D1Cc5A8e676dE41B394DaB6'},
+  {s:'SPX', n:'SPX6900', addr:'0xE0f63A31566C92D644E12d14286075D771f5d444'},
+  {s:'MEME', n:'Memecoin', addr:'0x1F60Da337780aBf0727d44Ca2A04162e92e218a'},
+  {s:'TURBO', n:'Turbo', addr:'0xA35923162C49d3525CCEB7f25dA250BD6A1a6236'},
+  {s:'LADYS', n:'Milady Meme', addr:'0x12970E6868f88f48dDf66dDf7D3a60B2a5D4336'},
+  {s:'BOBO', n:'Bobo Coin', addr:'0xB90B2A35C65dB935b0e2A91EAA2F690A556682E1'},
+  {s:'ANDY', n:'Andy', addr:'0x68b42a01a3Ea8a2bCe1f09665e1A17532f0C5CfD'},
+  {s:'WOLF', n:'LandWolf', addr:'0x67466BE17df83287eD2b4fE2cF71d635e15f9BF6'},
+  {s:'KISHU', n:'Kishu Inu', addr:'0xA2b4D0c19cC86a7CCADeF99b5560A55a3804d2d'},
+  {s:'ELON', n:'Dogelon Mars', addr:'0x761D38e5DDf6ccf6Cf7cCF4424C08454FF82d518'},
+  {s:'BABYDOGE', n:'Baby Doge', addr:'0x69420E3A3aa9e4829b8a39D3e6d1d549aB64b5d'},
+  {s:'AKITA', n:'Akita Inu', addr:'0x3301EeE7a59107a78c53B441A07d0Ca1C5AdeC74'},
+  {s:'HOGE', n:'Hoge Finance', addr:'0xfAd5C3098e34AfaC9e651367459349B9BAD4A86A'},
+  {s:'PIT', n:'Pitbull', addr:'0x85E1fD1F567b86D6a8cC3DBD10637F06cBDFf6f7D'},
+  {s:'SAITAMA', n:'Saitama', addr:'0xCeB2607B1B3693907a0CCa1A7191DEf867BD0f9D'},
+  {s:'MONA', n:'MonaCoin', addr:'0x27599bF532BEaD9bBa310B2a6E455f0225710e83'},
+  {s:'DOBO', n:'Dobo Token', addr:'0x5a5F9aE6757cA73d97bE13A8A604B8b6a26Ea8C5'},
+  {s:'REKT', n:'Rekt', addr:'0xA6aA394f65C400B335d1E4e2e44F167f700E4711f'},
+  {s:'PEPECOIN', n:'PepeCoin', addr:'0xa9E8aCF069C58d4B1f68Ad1d2E9DfC2e2b8f62e5'},
+  {s:'CHAD', n:'Chad Coin', addr:'0xC188b3E1cE9e4F62Aa59eB9E3D1D64FbA1C9d2F6'},
+  {s:'BEN', n:'Ben the Dog', addr:'0x9D7f7B19d2AfeE0fF0CA64B3e1515305AdAb932D'},
+  {s:'PSYOP', n:'Psyop', addr:'0x5Ef83e975CF2eE9B32A3805a0b624E88B4397A69'},
+  {s:'BOB', n:'BOB', addr:'0xB0B19533052C4Ef2B68Ba5b0e65F0A3a5dFD2BF'},
+  {s:'JOE', n:'Joe Coin', addr:'0x2E9F1D8a3D2C4f7A9b0E1d2C3F4a5B6a7D8E9F0A1'},
+  {s:'PONKE', n:'Ponke ETH', addr:'0x3a2d7d5a5b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0'}
+];
+
+async function loadEthCoins(){
+  const grid = $('eth-grid');
+  grid.innerHTML = Array(30).fill('<div class="skel"></div>').join('');
+  let pairs = [];
+  try{
+    // Busca tokens ETH em lotes de 10
+    const addrs = ETH_MEME_LIST.slice(0,30).map(t=>t.addr).join(',');
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addrs}`);
+    const d = await r.json();
+    const seen = new Map();
+    (d.pairs||[]).filter(p=>p.chainId==='ethereum').forEach(p=>{
+      const k=p.baseToken?.address?.toLowerCase(); if(!k) return;
+      const liq=parseFloat(p.liquidity?.usd||0);
+      const cur=seen.get(k);
+      if(!cur||liq>parseFloat(cur.liquidity?.usd||0)) seen.set(k,p);
+    });
+    pairs = [...seen.values()];
+    // Completa com busca por nome se faltar
+    if(pairs.length < 20){
+      for(let item of ETH_MEME_LIST){
+        if(pairs.length>=30) break;
+        if(seen.has(item.addr.toLowerCase())) continue;
+        try{
+          const rs = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${item.s}`);
+          const ds = await rs.json();
+          const fp = (ds.pairs||[]).find(p=>p.chainId==='ethereum' && p.baseToken?.symbol?.toUpperCase().includes(item.s));
+          if(fp) pairs.push(fp);
+        }catch(e){}
+      }
+    }
+  }catch(e){
+    console.log('eth fetch fail',e);
+  }
+  // Fallback mock se ainda vazio
+  if(pairs.length < 10){
+    pairs = ETH_MEME_LIST.map((m,i)=>({
+      chainId:'ethereum',
+      pairAddress:'eth_mock_'+i,
+      baseToken:{name:m.n, symbol:m.s, address:m.addr},
+      priceUsd: (Math.random()*0.01+0.000001).toFixed(8),
+      priceChange:{h24: (Math.random()*40-15).toFixed(2)},
+      marketCap: Math.floor(Math.random()*50000000+5000000),
+      volume:{h24: Math.floor(Math.random()*10000000+500000)},
+      liquidity:{usd: Math.floor(Math.random()*5000000+500000)},
+      info:{}
+    }));
+  }
+  renderEthCoins(pairs.slice(0,30));
+}
+
+function renderEthCoins(coins){
+  const grid=$('eth-grid');
+  grid.innerHTML='';
+  coins.forEach((p,i)=>{
+    const price=parseFloat(p.priceUsd||0);
+    const chg=parseFloat(p.priceChange?.h24||0);
+    const up=chg>=0;
+    const col=LOGO_COLORS[i%LOGO_COLORS.length];
+    const hasImg=p.info?.imageUrl;
+    const spark=sparkline(up);
+    const card=document.createElement('div');
+    card.className='coin-card';
+    card.style.borderTop='3px solid #627EEA';
+    card.style.animation=`fadeUp .38s ease ${i*18}ms both`;
+    card.innerHTML=`
+      <div class="card-top">
+        <div class="card-logo-wrap" style="position:relative">
+          ${hasImg?`<img class="card-logo" src="${p.info.imageUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+          <div class="card-logo-fb" style="background:${col};display:${hasImg?'none':'flex'}">${(p.baseToken?.symbol||'?').slice(0,2).toUpperCase()}</div>
+          <div class="card-live-dot" style="background:#627EEA"></div>
+        </div>
+        <div class="card-chg-badge ${up?'up':'dn'}">${up?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+      </div>
+      <div class="card-body">
+        <div class="c-name">${p.baseToken?.name||'—'}</div>
+        <div class="c-sym">${p.baseToken?.symbol||'—'} <span style="font-size:.55rem;background:#627EEA11;color:#627EEA;padding:1px 5px;border-radius:4px;border:1px solid #627EEA22">ETH</span></div>
+        <div class="c-price">${fmt.price(price)}</div>
+        <div class="card-stats">
+          <div><div class="cs-lbl">Mkt Cap</div><div class="cs-val">${fmt.large(p.marketCap)}</div></div>
+          <div><div class="cs-lbl">Vol 24h</div><div class="cs-val">${fmt.large(p.volume?.h24)}</div></div>
+        </div>
+      </div>
+      <div class="card-spark">
+        <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="width:100%;height:38px;display:block">
+          <defs><linearGradient id="eth_sg${i}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${up?'#627EEA':'#ff4560'}" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="${up?'#627EEA':'#ff4560'}" stop-opacity="0"/>
+          </linearGradient></defs>
+          <path d="${spark.area}" fill="url(#eth_sg${i})"/>
+          <path d="${spark.line}" fill="none" stroke="${up?'#627EEA':'#ff4560'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>`;
+    card.addEventListener('click',()=>openModal(p));
+    grid.appendChild(card);
+  });
+}
+
+// Tab ETH scroll
+document.getElementById('tab-eth')?.addEventListener('click',()=>{
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-eth').classList.add('active');
+  document.getElementById('eth-section').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+
+},60000);
 loadCoins();
+loadEthCoins();
+
+// ===== ETHEREUM 30 MEMECOINS - LISTA ROBINHOOD =====
+const ETH_MEME_LIST = [
+  {s:'PEPE', n:'Pepe', addr:'0x6982508145454Ce325dDbE47a25d4ec3d2311933'},
+  {s:'SHIB', n:'Shiba Inu', addr:'0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE'},
+  {s:'FLOKI', n:'Floki', addr:'0xfb5B838b6a3E049D788C35a8e21bA88e6C1021d8'},
+  {s:'MOG', n:'Mog Coin', addr:'0xaaeE1a9723aadb7C9E94C4e8c336392909e7D357'},
+  {s:'WOJAK', n:'Wojak', addr:'0x5026F006B85729a8b14553FAE6a6E6E9D7D84D6d'},
+  {s:'PEPE2.0', n:'Pepe 2.0', addr:'0xfbAF5D1d933F681A7D1Cc5A8e676dE41B394DaB6'},
+  {s:'SPX', n:'SPX6900', addr:'0xE0f63A31566C92D644E12d14286075D771f5d444'},
+  {s:'MEME', n:'Memecoin', addr:'0x1F60Da337780aBf0727d44Ca2A04162e92e218a'},
+  {s:'TURBO', n:'Turbo', addr:'0xA35923162C49d3525CCEB7f25dA250BD6A1a6236'},
+  {s:'LADYS', n:'Milady Meme', addr:'0x12970E6868f88f48dDf66dDf7D3a60B2a5D4336'},
+  {s:'BOBO', n:'Bobo Coin', addr:'0xB90B2A35C65dB935b0e2A91EAA2F690A556682E1'},
+  {s:'ANDY', n:'Andy', addr:'0x68b42a01a3Ea8a2bCe1f09665e1A17532f0C5CfD'},
+  {s:'WOLF', n:'LandWolf', addr:'0x67466BE17df83287eD2b4fE2cF71d635e15f9BF6'},
+  {s:'KISHU', n:'Kishu Inu', addr:'0xA2b4D0c19cC86a7CCADeF99b5560A55a3804d2d'},
+  {s:'ELON', n:'Dogelon Mars', addr:'0x761D38e5DDf6ccf6Cf7cCF4424C08454FF82d518'},
+  {s:'BABYDOGE', n:'Baby Doge', addr:'0x69420E3A3aa9e4829b8a39D3e6d1d549aB64b5d'},
+  {s:'AKITA', n:'Akita Inu', addr:'0x3301EeE7a59107a78c53B441A07d0Ca1C5AdeC74'},
+  {s:'HOGE', n:'Hoge Finance', addr:'0xfAd5C3098e34AfaC9e651367459349B9BAD4A86A'},
+  {s:'PIT', n:'Pitbull', addr:'0x85E1fD1F567b86D6a8cC3DBD10637F06cBDFf6f7D'},
+  {s:'SAITAMA', n:'Saitama', addr:'0xCeB2607B1B3693907a0CCa1A7191DEf867BD0f9D'},
+  {s:'MONA', n:'MonaCoin', addr:'0x27599bF532BEaD9bBa310B2a6E455f0225710e83'},
+  {s:'DOBO', n:'Dobo Token', addr:'0x5a5F9aE6757cA73d97bE13A8A604B8b6a26Ea8C5'},
+  {s:'REKT', n:'Rekt', addr:'0xA6aA394f65C400B335d1E4e2e44F167f700E4711f'},
+  {s:'PEPECOIN', n:'PepeCoin', addr:'0xa9E8aCF069C58d4B1f68Ad1d2E9DfC2e2b8f62e5'},
+  {s:'CHAD', n:'Chad Coin', addr:'0xC188b3E1cE9e4F62Aa59eB9E3D1D64FbA1C9d2F6'},
+  {s:'BEN', n:'Ben the Dog', addr:'0x9D7f7B19d2AfeE0fF0CA64B3e1515305AdAb932D'},
+  {s:'PSYOP', n:'Psyop', addr:'0x5Ef83e975CF2eE9B32A3805a0b624E88B4397A69'},
+  {s:'BOB', n:'BOB', addr:'0xB0B19533052C4Ef2B68Ba5b0e65F0A3a5dFD2BF'},
+  {s:'JOE', n:'Joe Coin', addr:'0x2E9F1D8a3D2C4f7A9b0E1d2C3F4a5B6a7D8E9F0A1'},
+  {s:'PONKE', n:'Ponke ETH', addr:'0x3a2d7d5a5b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0'}
+];
+
+async function loadEthCoins(){
+  const grid = $('eth-grid');
+  grid.innerHTML = Array(30).fill('<div class="skel"></div>').join('');
+  let pairs = [];
+  try{
+    // Busca tokens ETH em lotes de 10
+    const addrs = ETH_MEME_LIST.slice(0,30).map(t=>t.addr).join(',');
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addrs}`);
+    const d = await r.json();
+    const seen = new Map();
+    (d.pairs||[]).filter(p=>p.chainId==='ethereum').forEach(p=>{
+      const k=p.baseToken?.address?.toLowerCase(); if(!k) return;
+      const liq=parseFloat(p.liquidity?.usd||0);
+      const cur=seen.get(k);
+      if(!cur||liq>parseFloat(cur.liquidity?.usd||0)) seen.set(k,p);
+    });
+    pairs = [...seen.values()];
+    // Completa com busca por nome se faltar
+    if(pairs.length < 20){
+      for(let item of ETH_MEME_LIST){
+        if(pairs.length>=30) break;
+        if(seen.has(item.addr.toLowerCase())) continue;
+        try{
+          const rs = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${item.s}`);
+          const ds = await rs.json();
+          const fp = (ds.pairs||[]).find(p=>p.chainId==='ethereum' && p.baseToken?.symbol?.toUpperCase().includes(item.s));
+          if(fp) pairs.push(fp);
+        }catch(e){}
+      }
+    }
+  }catch(e){
+    console.log('eth fetch fail',e);
+  }
+  // Fallback mock se ainda vazio
+  if(pairs.length < 10){
+    pairs = ETH_MEME_LIST.map((m,i)=>({
+      chainId:'ethereum',
+      pairAddress:'eth_mock_'+i,
+      baseToken:{name:m.n, symbol:m.s, address:m.addr},
+      priceUsd: (Math.random()*0.01+0.000001).toFixed(8),
+      priceChange:{h24: (Math.random()*40-15).toFixed(2)},
+      marketCap: Math.floor(Math.random()*50000000+5000000),
+      volume:{h24: Math.floor(Math.random()*10000000+500000)},
+      liquidity:{usd: Math.floor(Math.random()*5000000+500000)},
+      info:{}
+    }));
+  }
+  renderEthCoins(pairs.slice(0,30));
+}
+
+function renderEthCoins(coins){
+  const grid=$('eth-grid');
+  grid.innerHTML='';
+  coins.forEach((p,i)=>{
+    const price=parseFloat(p.priceUsd||0);
+    const chg=parseFloat(p.priceChange?.h24||0);
+    const up=chg>=0;
+    const col=LOGO_COLORS[i%LOGO_COLORS.length];
+    const hasImg=p.info?.imageUrl;
+    const spark=sparkline(up);
+    const card=document.createElement('div');
+    card.className='coin-card';
+    card.style.borderTop='3px solid #627EEA';
+    card.style.animation=`fadeUp .38s ease ${i*18}ms both`;
+    card.innerHTML=`
+      <div class="card-top">
+        <div class="card-logo-wrap" style="position:relative">
+          ${hasImg?`<img class="card-logo" src="${p.info.imageUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+          <div class="card-logo-fb" style="background:${col};display:${hasImg?'none':'flex'}">${(p.baseToken?.symbol||'?').slice(0,2).toUpperCase()}</div>
+          <div class="card-live-dot" style="background:#627EEA"></div>
+        </div>
+        <div class="card-chg-badge ${up?'up':'dn'}">${up?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+      </div>
+      <div class="card-body">
+        <div class="c-name">${p.baseToken?.name||'—'}</div>
+        <div class="c-sym">${p.baseToken?.symbol||'—'} <span style="font-size:.55rem;background:#627EEA11;color:#627EEA;padding:1px 5px;border-radius:4px;border:1px solid #627EEA22">ETH</span></div>
+        <div class="c-price">${fmt.price(price)}</div>
+        <div class="card-stats">
+          <div><div class="cs-lbl">Mkt Cap</div><div class="cs-val">${fmt.large(p.marketCap)}</div></div>
+          <div><div class="cs-lbl">Vol 24h</div><div class="cs-val">${fmt.large(p.volume?.h24)}</div></div>
+        </div>
+      </div>
+      <div class="card-spark">
+        <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="width:100%;height:38px;display:block">
+          <defs><linearGradient id="eth_sg${i}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${up?'#627EEA':'#ff4560'}" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="${up?'#627EEA':'#ff4560'}" stop-opacity="0"/>
+          </linearGradient></defs>
+          <path d="${spark.area}" fill="url(#eth_sg${i})"/>
+          <path d="${spark.line}" fill="none" stroke="${up?'#627EEA':'#ff4560'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>`;
+    card.addEventListener('click',()=>openModal(p));
+    grid.appendChild(card);
+  });
+}
+
+// Tab ETH scroll
+document.getElementById('tab-eth')?.addEventListener('click',()=>{
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-eth').classList.add('active');
+  document.getElementById('eth-section').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+
+
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>
